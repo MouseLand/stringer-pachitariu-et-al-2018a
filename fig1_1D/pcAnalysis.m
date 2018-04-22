@@ -1,4 +1,4 @@
-function results = pcAnalysis(dataroot,matroot)
+function results = pcAnalysis(dataroot,matroot, useGPU)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 dex = 1;

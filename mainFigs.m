@@ -15,7 +15,7 @@ useGPU = 0;
 %% this will perform analyses and save output for figures
 
 %% run analysis for figure 1
-pcAnalysis(dataroot,matroot);
+pcAnalysis(dataroot,matroot, useGPU);
 
 %% run analysis for figure 2 and 4
 predictNeuronsFromAllBeh(dataroot,matroot,useGPU);
