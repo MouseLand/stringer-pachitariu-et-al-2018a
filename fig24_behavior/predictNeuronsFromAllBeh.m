@@ -107,9 +107,8 @@ for d = [1:length(dall.db)]
         
         %% low rank regression
         if size(x,1) > 1
-            [a, b] = CanonCor2(gpuArray(v(:,indtrain)'), gpuArray(x(:,indtrain)'), .05);
-            a      = gather(a);
-            b      = gather(b);
+            [a, b] = CanonCor2(v(:,indtrain)'), x(:,indtrain)', .05);
+            
         else
             b = 1;
             a = v(:,indtrain) * x(:,indtrain)' / (x(:,indtrain)*x(:,indtrain)');
