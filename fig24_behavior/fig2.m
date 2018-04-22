@@ -1,8 +1,9 @@
-clearvars -except dat
-load('example_behavior.mat');
-load('expv_behavior_neurons (4).mat');
-load('../peerPCA/PCApred2.mat');
-dd=load('arousalcorr.mat');
+function fig2(matroot)
+
+
+load(fullfile(matroot,'example_behavior.mat'));
+load(fullfile(matroot,'expv_behavior_neurons.mat'));
+
 %%
 close all;
 default_figure([20 10 6 8]);
@@ -295,8 +296,8 @@ grid minor;
 ccall=[];
 posall=[];
 for d = 1:9
-    ccall = [ccall; dd.cc{d}];
-    posall = [posall; dd.cellpos{d}];
+    ccall = [ccall; ccarousal{d}];
+    posall = [posall; cellpos{d}];
 end
 %ic=max(abs(ccall),[],2)>.2;
 %ccall = ccall(ic,:);
@@ -360,21 +361,3 @@ for j = [1:length(hs)]
     axis([0 1 0 1]);
     axis off;
 end
-
-%%
-print('../figs/fig2beh.pdf','-dpdf','-fillpage');
-
-
-%%
-i=i+1;
-hs{i} = my_subplot(3,6,6);
-plot([1:2],squeeze(expv_behavior([1 3],:,7)))
-hold all;
-plot([1:2],mean(squeeze(expv_behavior([1 3],:,7) ),2),'k','linewidth',2)
-box off;
-set(gca,'xtick',[1:8],'xticklabel',{'1D','3D'});
-axis square;
-ylabel('variance explained');
-box off;
-ylim([0 .06]);
-

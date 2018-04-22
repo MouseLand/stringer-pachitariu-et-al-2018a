@@ -1,22 +1,20 @@
-clear all;
+function arousalDepths(dataroot, matroot)
 
-%%
-load('../dbspont.mat');
+dall=load(fullfile(dataroot, 'dbspont.mat'));
 
-clf;
-%%
-for d = [1:length(db)]
+for d = [1:length(dall.db)]
     %%
-    dat = load(sprintf('../spont_%s_%s.mat',db(d).mouse_name,db(d).date));
-    
+    dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
     if isfield(dat.stat, 'redcell')
         Ff = dat.Fsp(~logical([dat.stat(:).redcell]),:);
-        
         cellpos{d} = dat.med(~logical([dat.stat(:).redcell]),:);
     else
         Ff = dat.Fsp;
         cellpos{d} = dat.med;
     end
+    cellpos{d} = cellpos{d}(sum(Ff,2)>0,:);
+    Ff = Ff(sum(Ff,2)>0,:);
+    
     
     %%
     tdelay = 1;
@@ -46,7 +44,7 @@ for d = [1:length(db)]
     
 end
 
-save('arousalcorr.mat','cc','cellpos');
+save(fullfile(matroot,'arousalcorr.mat'),'cc','cellpos');
 
 
 
