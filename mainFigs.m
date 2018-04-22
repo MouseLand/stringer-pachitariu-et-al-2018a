@@ -1,14 +1,16 @@
-% add the path of this folder
+% change the path to this folder first
 addpath(genpath('.'));
 
 % you should change this to your local data paths
-dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper/';
+dataroot = 'C:\DATA\figshare';
 
 % give a local folder for saving intermediate data (3GB max)
-matroot = '/media/carsen/DATA2/mats/';
+matroot = 'D:\DATA\mats\';
+
+mkdir(matroot)
 
 % do you have a GPU? if not set to 0
-useGPU = 1;
+useGPU = 0;
 
 %% this will perform analyses and save output for figures
 
