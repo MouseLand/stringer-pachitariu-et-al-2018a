@@ -67,9 +67,7 @@ for d = [1:length(db)]
     ndims1 = ndims0(ndims0<=size(x,1) & ndims0<=size(v,1));
         
     %% low rank regression
-    [a, b] = CanonCor2(gpuArray(v(:,indtrain)'), gpuArray(x(:,indtrain)'), .05);
-    a      = gather(a);
-    b      = gather(b);
+    [a, b] = CanonCor2(v(:,indtrain)', x(:,indtrain)', .05);
     
     % prediction of neural activity
     expv = [];
