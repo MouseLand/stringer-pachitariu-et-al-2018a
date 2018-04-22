@@ -23,7 +23,7 @@ for d = [1:length(dall.db)]
     end
     med = med(sum(Ff,2)>0,:);
     Ff = Ff(sum(Ff,2)>0,:);
-    fprintf('recording %d\n',d);
+    fprintf('recording %d\n
     % pairwise distances
     NN = size(med,1);
     dists = zeros(NN,NN,'single');
@@ -105,7 +105,11 @@ for d = [1:length(dall.db)]
         bcells(rcells==2) = 1;
     end
     
-    results.pcdist(d) = sum(bcells==1) / (sum(bcells==1) + sum(bcells==2));
+    disp([results.indist(:,d) results.outdist(:,d)]);
+    
+    disp([sum(bcells==1)/NN sum(bcells==2)/NN])
+    
+   results.pcdist(d) = sum(bcells==1) / (sum(bcells==1) + sum(bcells==2));
     
     if d == dex
         results.cellmed = med;
