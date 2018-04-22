@@ -1,7 +1,10 @@
+% add the path of this folder
 addpath(genpath('.'));
 
-% change to path of data
+% you should change this to your local data paths
 dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper/';
+
+% give a local folder for saving intermediate data (3GB max)
 matroot = '/media/carsen/DATA2/mats/';
 
 %% this will perform analyses and save output for figures
