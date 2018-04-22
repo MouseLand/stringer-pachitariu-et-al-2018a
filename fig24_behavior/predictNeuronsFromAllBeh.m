@@ -41,10 +41,14 @@ for d = [1:length(dall.db)]
     
     y = bin2d(y, tbin, 2);
     y = y - mean(y,2);
-    
-    [u s v] = svdecon(gpuArray(single(y)));
+
+    if useGPU
+        [u s v] = svdecon(gpuArray(single(y)));
+    else
+        [u s v] = svdecon(single(y));
+    end
     ncomps  = 128;
-    u       = gather(u(:, 1:ncomps));
+    u       = gather_try(u(:, 1:ncomps));% * s(1:ncomps,1:ncomps));
     v       = u' * y;
     
     NT = size(y,2);

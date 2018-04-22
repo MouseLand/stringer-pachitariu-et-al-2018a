@@ -19,21 +19,23 @@ quantifyBehavior(dataroot,matroot);
 
 %% figure 3
 smooth1Dclusters(dataroot,matroot,useGPU);
-%% this is pretty slow 
+% peer prediction is pretty slow (different peers for each neuron)
 % (I've put the mat file in the folder if you want to use it 'PCApred.mat')
 peerExcludeNeighbors(dataroot,matroot,useGPU);
 
 %% figure 4
+% you can increase nseed in this script to average more but it will be
+% slower (we used nseed = 10 in the paper)
+faceTimelags(dataroot,matroot,useGPU);
 
 %% this will produce the figures
 
 fig1(matroot);
 
 fig2(matroot);
-%%
+
 fig3(matroot);
 %%
-
 fig4(matroot);
 
 %% supplementary figures

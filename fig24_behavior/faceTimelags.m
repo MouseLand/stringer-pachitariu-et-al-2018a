@@ -1,27 +1,31 @@
-clearvars -except dat;
+function faceTimelags(dataroot,matroot,useGPU)
 
-%%
+dall=load(fullfile(dataroot, 'dbspont.mat'));
+
 ndims0 = [1 2 3 4 8 16 32 64 128];
 
-
 tdelay = [-8*3:3:-5 -4:4 5:3:8*3];
-load('../dbspont.mat');
-expv_tlag = zeros(length(ndims0),length(db),length(tdelay));
-
 
 clf;
+expv_tlag = zeros(length(ndims0),length(dall.db),length(tdelay));
+
+
+dex = 2;
 %%
 rng('default');
-for d = [1:length(db)]
+for d = [1:length(dall.db)]
     %%
-    dat = load(sprintf('../spont_%s_%s.mat',db(d).mouse_name,db(d).date));
+    dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
     
-    if isfield(dat.stat, 'redcell')
-        Ff = dat.Fsp(~logical([dat.stat(:).redcell]),:);
+    if isfield(dat.stat,'redcell')
+        Ff = dat.Fsp(~logical([dat.stat(:).redcell]), :);
+        med    = dat.med(~logical([dat.stat(:).redcell]),:);
     else
         Ff = dat.Fsp;
+        med    = dat.med;
     end
-    y = Ff;
+    med = med(sum(Ff,2)>0,:);
+    Ff = Ff(sum(Ff,2)>0,:);
     
     % 1.2 second bins
     if dat.db.nplanes == 10
@@ -30,13 +34,18 @@ for d = [1:length(db)]
         tbin = 3;
     end
     
-    % bin activity to compute svd
+    y = Ff;
+    % bin activity (only to compute svd)
     y = y - mean(y,2);
     y = bin2d(y, tbin, 2);
     
-    [u s v] = svdecon(gpuArray(single(y)));
+    if useGPU
+        [u s v] = svdecon(gpuArray(single(y)));
+    else
+        [u s v] = svdecon(single(y));
+    end
     ncomps  = 128;
-    u       = gather(u(:, 1:ncomps));% * s(1:ncomps,1:ncomps));
+    u       = gather_try(u(:, 1:ncomps));
     
     
     [NN NT] = size(y);
@@ -45,8 +54,13 @@ for d = [1:length(db)]
     
     
     %%
+    x = dat.beh.face.motionSVD;
+    x = x - mean(x,1);
+    x = x / std(x(:,1)) * 10;
+    x    = x';
+    x0 = x;    
     for k = 1:numel(tdelay)
-        td = tdelay(k)
+        td = tdelay(k);
         NT = size(Ff,2);
         tpred  = max(1, 1-td) : min(NT, NT-td);
         tneur  = max(1, 1+td) : min(NT, NT+td);
@@ -56,18 +70,15 @@ for d = [1:length(db)]
         y   = bin2d(y, tbin, 2);
         v       = u' * y;
         
-        x = dat.beh.face.motionSVD;
-        x = x - mean(x,1);
-        x = x / std(x(:,1)) * 10;
-        x    = x';
-        x = x(:,tpred);
+        x = x0(:,tpred);
         x = bin2d(x, tbin, 2);
         
         NT = size(y,2);
         Lblock = 60;
         fractrain = 0.5;
         
-        nseed = 10;
+        % can increase this to average more over different splits of the data in time
+        nseed = 1; 
         
         ndims1 = ndims0(ndims0<=size(x,1) & ndims0<=size(v,1));
             
@@ -101,21 +112,17 @@ for d = [1:length(db)]
             
             semilogx(ndims1,expv,'*-');
             hold all;
-            %ylim([0 1]);
-            title(max(expv));%dat{d}.db.expt_name{1});
-            %ylim([0 .1])
+            title([d td max(expv)]);
             axis tight;
             drawnow;
             expv_tlag(1:length(ndims1),d,k) = expv_tlag(1:length(ndims1),d,k) + expv(:)/nseed;
-            %expvPC_tlag(:,1:length(ndims1),d,k) = expvPC;
         end
-        
     end
 end
 
 
 %%
-save('expv_timedelay.mat','expv_tlag','tdelay','ndims0');
+save(fullfile(matroot,'expv_timedelay.mat'),'expv_tlag','tdelay','ndims0');
 
 
 
