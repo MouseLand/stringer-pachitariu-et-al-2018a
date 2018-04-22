@@ -1,27 +1,31 @@
-clearvars -except dat;
+function results = predictNeuronsFromAllBeh(dataroot, matroot, useGPU)
 
-%%
+dall=load(fullfile(dataroot, 'dbspont.mat'));
+
 ndims0 = [1 2 3 4 8 16 32 64 128];
 
-load('../dbspont.mat');
 clf;
-expv_behavior = NaN*ones(length(ndims0),length(db),14);
-expvPC_behavior = NaN*ones(128,length(ndims0),length(db),14);
+expv_behavior = NaN*ones(length(ndims0),length(dall.db),10);
+expvPC_behavior = NaN*ones(128,length(ndims0),length(dall.db),10);
 
 
 dex = 2;
 %%
 rng('default');
-for d = [1:length(db)]
+for d = [1:length(dall.db)]
     %%
-    dat = load(sprintf('../spont_%s_%s.mat',db(d).mouse_name,db(d).date));
+    dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
     
-    if isfield(dat.stat, 'redcell')
-        Ff = dat.Fsp(~logical([dat.stat(:).redcell]),:);
+    if isfield(dat.stat,'redcell')
+        Ff = dat.Fsp(~logical([dat.stat(:).redcell]), :);
+        med    = dat.med(~logical([dat.stat(:).redcell]),:);
     else
         Ff = dat.Fsp;
+        med    = dat.med;
     end
-    
+    med = med(sum(Ff,2)>0,:);
+    Ff = Ff(sum(Ff,2)>0,:);
+        
     tdelay = 1; % optimal time delay
     y    = Ff(:,(tdelay+1):end);
     [NN NT] = size(y);
@@ -37,20 +41,24 @@ for d = [1:length(db)]
     
     y = bin2d(y, tbin, 2);
     y = y - mean(y,2);
-    
-    [u s v] = svdecon(gpuArray(single(y)));
+
+    if useGPU
+        [u s v] = svdecon(gpuArray(single(y)));
+    else
+        [u s v] = svdecon(single(y));
+    end
     ncomps  = 128;
-    u       = gather(u(:, 1:ncomps));
+    u       = gather_try(u(:, 1:ncomps));% * s(1:ncomps,1:ncomps));
     v       = u' * y;
     
     NT = size(y,2);
-    Lblock = round(60/.8);
+    Lblock = round(75);
     fractrain = 0.5;
     [indtrain, indtest] = splitInterleaved(NT, Lblock, fractrain,1);
         
-    %% loop over predictors
+    %% loop over behavioral predictors
     clf;
-    for btype = [1:14]
+    for btype = [1:10]
         wmot = dat.beh.whisker.motionSVD(:,1);
         wmot = wmot * sign(mean(mean(dat.beh.whisker.motionMask(:,:,1))));
         switch btype
@@ -77,25 +85,6 @@ for d = [1:length(db)]
                 x = x / std(x(:,1));
             case 10
                 x = dat.beh.face.motionSVD;
-                x = x - mean(x,1);
-                x = x / std(x(:,1));
-                x = [x zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:) wmot],1,1)];
-            case 11
-                x = dat.beh.whisker.motionSVD;
-                x = x - mean(x,1);
-                x = x / std(x(:,1));
-            case 12
-                x = dat.beh.whisker.motionSVD;
-                x = x - mean(x,1);
-                x = x / std(x(:,1));
-                x = [x zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:) wmot],1,1)];
-                
-            case 13
-                x = dat.beh.eye.motionSVD;
-                x = x - mean(x,1);
-                x = x / std(x(:,1));
-            case 14
-                x = dat.beh.eye.motionSVD;
                 x = x - mean(x,1);
                 x = x / std(x(:,1));
                 x = [x zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:) wmot],1,1)];
@@ -167,24 +156,26 @@ for d = [1:length(db)]
             xtest1d{d} = x(:,indtest);
             n1d(:,d) = a(:,1);
             umat{d} = u;
-            disp(b(:,1));
+            
+            ccarousal{d} = corr(y',x');
         end
         
         %% sort data by 1D embedding
         if btype == 9
-            nC=30;
-            [~,isort] = sort(u(:,1));
-            [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort);
-            yt = y(isort,indtest);
-            ytstd = max(1e-3,std(yt,1,2));
-            yt = yt ./ ytstd;
-            yp = yp0(isort,:) ./ ytstd;
-            
-            yt = my_conv2(yt,6,1);
-            yp = my_conv2(yp,1,1);
-            ccembed(d) = corr(yt(:),yp(:));
-            disp(ccembed);
             if d == dex
+                nC=30;
+                [~,isort] = sort(u(:,1));
+                [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort,useGPU);
+                yt = y(isort,indtest);
+                ytstd = max(1e-3,std(yt,1,2));
+                yt = yt ./ ytstd;
+                yp = yp0(isort,:) ./ ytstd;
+            
+                yt = my_conv2(yt,6,1);
+                yp = my_conv2(yp,1,1);
+                ccembed(d) = corr(yt(:),yp(:));
+                disp(ccembed);
+
                 vtest{d} = v(:,indtest);
                 vpred{d} = vp;
                 ypred{d} = yp0;
@@ -201,14 +192,15 @@ for d = [1:length(db)]
         
     end
     
+    cellpos{d} = med;
 end
 
 c1d=real(c1d);
 
 %%
-save('expv_behavior_neurons.mat','-v7.3','expv_behavior','expvPC_behavior','ndims0',...
+save(fullfile(matroot,'expv_behavior_neurons.mat'),'-v7.3','expv_behavior','expvPC_behavior','ndims0',...
     'c1d','n1d','vtest','xtest1d','vpred','ypred','umat','ytest','xtest','aface','bface',...
-    'isortembed','ccembed');
+    'isortembed','ccembed','cellpos','ccarousal');
 
 
 

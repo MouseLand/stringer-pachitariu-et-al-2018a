@@ -1,9 +1,14 @@
-clear all;
-load('example_behavior.mat');
-load('expv_behavior_neurons.mat');
-load('../peerPCA/PCApred2.mat');
+function fig4(matroot)
+
 load('exampleMovie.mat');
-load('expv_timedelay.mat');
+load(fullfile(matroot,'example_behavior.mat'));
+load(fullfile(matroot,'expv_behavior_neurons.mat'));
+try
+    load(fullfile(matroot,'PCApred.mat'));
+catch
+    load('PCApred.mat');
+end
+load(fullfile(matroot,'expv_timedelay.mat'));
 
 %%
 close all;
@@ -31,7 +36,7 @@ load('cdat.mat');
 % cdat([3 4 6:9],:) = cred(randperm(6),:);
 %cdat(3,:) = cdat(4,:);
 %load('cdat.mat');
-ifr =9;
+ifr =1;
 cgray=colormap('gray');
 
 ncomps = 4;
@@ -416,12 +421,6 @@ for j = [1:length(hs)]
     axis([0 1 0 1]);
     axis off;
 end
-
-%%
-print('../figs/fig4face.pdf','-dpdf','-fillpage');
-
-%%
-
 
 tl=squeeze(mean(expv_tlag(6,:,:),2));
 

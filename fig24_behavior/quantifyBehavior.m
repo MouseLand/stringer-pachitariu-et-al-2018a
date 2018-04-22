@@ -1,12 +1,14 @@
-load('../dbspont.mat');
+function quantifyBehavior(dataroot, matroot)
+
+dall=load(fullfile(dataroot, 'dbspont.mat'));
 
 dex = 2;
 cc = [];
 
 %%
-for d = [1:length(db)]
+for d = [1:length(dall.db)]
 
-    dat = load(sprintf('../spont_%s_%s.mat',db(d).mouse_name,db(d).date));
+    dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
    
     whisk = dat.beh.whisker.motionSVD(:,1);
     whisk = whisk * sign(corr(dat.beh.runSpeed(:), whisk(:)));
@@ -24,4 +26,4 @@ cc = real(cc);
 
 %%
 
-save('example_behavior.mat','cc','xex');
+save(fullfile(matroot,'example_behavior.mat'),'cc','xex');

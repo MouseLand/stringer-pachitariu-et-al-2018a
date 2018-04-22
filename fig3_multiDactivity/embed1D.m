@@ -1,4 +1,4 @@
-function [iclustup, isort] = embed1D(S, nC, isort)
+function [iclustup, isort] = embed1D(S, nC, isort, useGPU)
 
 xs = 1:nC;
 xn = linspace(1, nC, nC*100);
@@ -23,7 +23,11 @@ iclust(iclust>nC) = nC;
 sig = [linspace(3,1,25) 1*ones(1,50)];
 
 for t = 1:numel(sig)
-    V = gpuArray.zeros(NT, nC, 'single');
+    if useGPU
+        V = gpuArray.zeros(NT, nC, 'single');
+    else
+        V = zeros(NT, nC, 'single');
+    end
     for j = 1:nC
         ix = iclust== j;
         V(:, j) = sum(S(ix, :),1);
@@ -40,5 +44,5 @@ for t = 1:numel(sig)
 end
 
 [cmaxup, iclustup] = max(cv * Km', [], 2);
-iclustup = gather(iclustup);
+iclustup = gather_try(iclustup);
 [~, isort] = sort(iclustup);
