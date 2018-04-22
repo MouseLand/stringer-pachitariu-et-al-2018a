@@ -1,6 +1,6 @@
 function peerExcludeNeighbors(dataroot,matroot,useGPU)
 
-nPC = 2.^[0:11];
+nPC = 2.^[0:10];
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
@@ -10,7 +10,7 @@ lambda = 10; % regularizer
 
 %%
 rng('default');
-for d = [1:length(db)]
+for d = [1:length(dall.db)]
     %%
     dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
     if isfield(dat.stat, 'redcell')
@@ -27,6 +27,7 @@ for d = [1:length(db)]
     % xyz distance
     pd = ((med(:,1)-med(:,1)').^2 + (med(:,2)-med(:,2)').^2 + (med(:,3)-med(:,3)')).^.5;
     
+    % exclude neurons less than 70 um away
     reps = 100 * (~(pd<70));
     
     %% bin spikes in 1.2 second bins
@@ -54,9 +55,9 @@ for d = [1:length(db)]
     if useGPU
         Ff = gpuArray(single(Ff));
     end
-    nneur = 2.^[12];
+    nneur = 2.^[13];
     for nn = 1:length(nneur)
-        for i = 1:min(numel(isp_tst), 1000)
+        for i = 1:min(numel(isp_tst), 100)
             isp_valid   = isp_tr(reps(isp_tst(i), isp_tr)>0);
             isp_valid   = isp_valid(1:min(numel(isp_valid),nneur(nn)));
             X           = Ff(isp_valid, itrain) / sqrt(size(Ff,1)) * sqrt(1e4);
@@ -80,8 +81,8 @@ for d = [1:length(db)]
                 rez = mean((Ff(isp_tst(i), itest) - Fpred).^2, 2);
                 tV  = mean(Ff(isp_tst(i), itest).^2, 2);
                 
-                results.resid{d}(i,k,nn) = gather(rez);
-                results.totvar{d}(i,k,nn) =  gather(tV);
+                results.resid{d}(i,k,nn) = gather_try(rez);
+                results.totvar{d}(i,k,nn) =  gather_try(tV);
             end
             if rem(i,100)==0
                 toc

@@ -1,11 +1,14 @@
-clear all;
-dd = load('../peerPCA/PCApred2.mat');
-load('clust1D.mat');
+function fig3(matroot)
+
+try
+    dd = load(fullfile(matroot,'PCApred.mat'));
+catch
+    dd = load('PCApred.mat');
+end
+load(fullfile(matroot,'clust1D.mat'));
 expv_neurons = dd.expv_neurons;
 ndims0 = 2.^[0:size(expv_neurons,1)-1];
-dd = load('../firstPC/corr1stpc.mat');
-beh = zscore(dd.results.behavior,1,1);
-
+beh = results.beh;
 
 %%
 
@@ -41,10 +44,10 @@ xh = .96;
 yh = .44;
 hs{i} = axes('position',[x0 y0 xh yh]);
 trange = 2900+[1:3000];
-imagesc(zscore(my_conv2(results.spks{dex}(end:-1:1,trange), [5 0.5], [1 2]),1,2),[0.1 0.7]);
+imagesc(zscore(my_conv2(results.spks(:,trange), [5 0.5], [1 2]),1,2),[0.1 0.7]);
 hold all;
-NN=size(results.spks{dex},1);
-plot([1 1]*-15, NN-500+[0 500],'k');
+NN=size(results.spks,1);
+plot([1 1]*-15, NN-1000+[0 1000],'k');
 ht=text(-.023,-.03,'  1000 neurons','fontangle','normal','fontsize',8);
 ht.Rotation = 90;
 axis tight;
@@ -61,7 +64,7 @@ beh(:,1)=min(3.5,beh(:,1));
 sbeh = sign(skewness(beh));
 p=[0 .5 0];
 for j = 1:3
-    plot(beh(round(trange(1)/4):round(trange(end)/4),j)*sbeh(j)-2.75*(j-1)+p(j),'linewidth',1,'color',cm(j,:));
+    plot(beh(trange,j)*sbeh(j)-2.75*(j-1)+p(j),'linewidth',1,'color',cm(j,:));
     text(.07+(j-1)*.1,1,tstr{j},'fontangle','normal','fontweight','bold','fontsize',8,'color',cm(j,:));
 end
 plot([0 60/1.2],[-1 -1]*3*j+2,'k')
@@ -207,97 +210,3 @@ for j = [1:length(hs)]
     axis off;
     
 end
-
-
-
-%%
-print('../figs/fig3peer.pdf','-dpdf','-bestfit');
-
-
-%%
-
-% old depth figures
-
-% i=i+1;
-% hs{i}=my_subplot(4,3,4,[.5 .5]);
-% hs{i}.Position(2) = hs{i}.Position(2)-.055;
-% axis off;
-% hp=hs{i}.Position;
-% axes('Position',[hp(1) hp(2) hp(3:4)*1.2]);
-% dall = [];
-% nh = [];
-% icl=[];
-% bed = [35*2-17:35:35*10];
-% for j = 1:nC
-%     dall = [dall; results.depth{j,dex}];
-%     icl  = [icl; j*ones(numel(results.depth{j,dex}),1)];
-%     nh(:,j) = histcounts(results.depth{j,dex}, bed);
-% end
-% nh = nh./nansum(nh,1);
-% nall = histcounts(dall, bed);
-% nall = nall/sum(nall);
-% plot(bed(1:end-1)+17 + 150,nall,'k','linewidth',4);
-% hold all;
-% for j = 1:nC
-%     plot(bed(1:end-1)+17 + 150,nh(:,j),'color',cm(j,:),'linewidth',1)
-% end
-% %ylim([0.05 .3]);
-% xlabel('depth (um)');
-% ylabel('fraction of neurons');
-% box off;
-% xlim([200 500])
-% camroll(-90)
-% %text(-.24,1.55, 'depth distribution','fontangle','normal');
-% 
-% i=i+1;
-% hs{i}=my_subplot(4,3,5,[.5 .5]);
-% hs{i}.Position(2) = hs{i}.Position(2)-.03;
-% hold all;
-% for j = 1:nC
-%     plot([results.indepth(j,dex) results.outdepth(j,dex)],'color',cm(j,:));
-% end
-% axis tight;
-% axis([.75 2.25 0 130])
-% box off;
-% axis square;
-% ylabel('pairwise distance (\mum)')
-% set(gca,'xtick',[1 2],'xticklabel',{'in-group','out-of-group'});
-% %xtickangle(45);
-% text(-.25,1.35, 'Distance in depth','fontangle','normal');
-% 
-% 
-% i=i+1;
-% hs{i}=my_subplot(4,3,6,[.5 .5]);
-% hs{i}.Position(2) = hs{i}.Position(2)-.03;
-% hold all;
-% for d = 1:ndat
-%     plot(mean([results.indepth(:,d) results.outdepth(:,d)],1),'color',cdat(d,:),'linewidth',.5);
-% end
-% axis([.75 2.25 0 130])
-% box off;
-% axis square;
-% ylabel('pairwise distance (\mum)')
-% set(gca,'xtick',[1 2],'xticklabel',{'in-group','out-of-group'});
-% text(-.25,1.35, 'Depth distance averaged','fontangle','normal');
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 

@@ -1,4 +1,4 @@
-function results = predictNeuronsFromAllBeh(dataroot, matroot)
+function results = predictNeuronsFromAllBeh(dataroot, matroot, useGPU)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
@@ -161,7 +161,7 @@ for d = [1:length(dall.db)]
             if d == dex
                 nC=30;
                 [~,isort] = sort(u(:,1));
-                [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort);
+                [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort,useGPU);
                 yt = y(isort,indtest);
                 ytstd = max(1e-3,std(yt,1,2));
                 yt = yt ./ ytstd;
