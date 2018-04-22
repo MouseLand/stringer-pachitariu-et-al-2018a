@@ -1,3 +1,4 @@
+function fig4(matroot)
 
 load('exampleMovie.mat');
 load(fullfile(matroot,'example_behavior.mat'));
@@ -420,12 +421,6 @@ for j = [1:length(hs)]
     axis([0 1 0 1]);
     axis off;
 end
-
-%%
-print('../figs/fig4face.pdf','-dpdf','-fillpage');
-
-%%
-
 
 tl=squeeze(mean(expv_tlag(6,:,:),2));
 

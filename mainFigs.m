@@ -35,7 +35,7 @@ fig1(matroot);
 fig2(matroot);
 
 fig3(matroot);
-%%
+
 fig4(matroot);
 
 %% supplementary figures
