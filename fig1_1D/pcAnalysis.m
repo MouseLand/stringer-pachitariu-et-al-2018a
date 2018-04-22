@@ -1,4 +1,4 @@
-function results = pcAnalysis(dataroot)
+function results = pcAnalysis(dataroot,matroot)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 dex = 1;
@@ -181,7 +181,7 @@ end
     
 %%
         
-save('corr1stpc.mat','results','dex');
+save(fullfile(matroot,'corr1stpc.mat'),'results','dex');
     
  
     
