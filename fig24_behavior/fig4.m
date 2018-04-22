@@ -8,7 +8,10 @@ try
 catch
     load('PCApred.mat');
 end
-load(fullfile(matroot,'expv_timedelay.mat'));
+try
+    load(fullfile(matroot,'expv_timedelay.mat'));
+catch
+end
 
 %%
 close all;
