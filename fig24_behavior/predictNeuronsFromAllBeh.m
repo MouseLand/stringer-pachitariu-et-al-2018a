@@ -107,7 +107,7 @@ for d = [1:length(dall.db)]
         
         %% low rank regression
         if size(x,1) > 1
-            [a, b] = CanonCor2(v(:,indtrain)'), x(:,indtrain)', .05);
+            [a, b] = CanonCor2(v(:,indtrain)', x(:,indtrain)', .05);
             
         else
             b = 1;
