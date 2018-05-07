@@ -3,7 +3,6 @@ function fig1(matroot)
 load(fullfile(matroot,'corr1stpc.mat'));
 
 %%
-close all;
 default_figure([1 1 6.25 8]);
 
 %%

@@ -11,8 +11,6 @@ ndims0 = 2.^[0:size(expv_neurons,1)-1];
 beh = results.beh;
 
 %%
-
-close all;
 default_figure([1 1 9 5]);
 
 

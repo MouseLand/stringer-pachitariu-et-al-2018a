@@ -6,8 +6,7 @@ load(fullfile(matroot,'stimfaceRepresentation.mat'));
 load(fullfile(matroot,'exResponses.mat'));
 
 %%
-close all;
-default_figure([15 1 9 8.5]);
+default_figure([1 1 9 8.5]);
 
 %%
 rng('default');

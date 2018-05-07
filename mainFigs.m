@@ -10,7 +10,7 @@ matroot = 'D:\DATA\mats\';
 mkdir(matroot)
 
 % do you have a GPU? if not set to 0
-useGPU = 0;
+useGPU = 1;
 
 %% this will perform analyses and save output for figures
 
@@ -39,6 +39,8 @@ stimfaceVariance(dataroot,matroot,useGPU);
 
 %% this will produce the figures
 
+close all;
+
 fig1(matroot);
 
 fig2(matroot);
@@ -48,4 +50,5 @@ fig3(matroot);
 fig4(matroot);
 
 fig6(matroot);
+
 %% supplementary figures

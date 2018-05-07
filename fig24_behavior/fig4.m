@@ -14,7 +14,6 @@ catch
 end
 
 %%
-close all;
 
 figX = 6;
 figY = 8;
