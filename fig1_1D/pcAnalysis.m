@@ -1,4 +1,4 @@
-function results = pcAnalysis(dataroot,matroot)
+function results = pcAnalysis(dataroot,matroot, useGPU)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 dex = 1;
@@ -46,9 +46,13 @@ for d = [1:length(dall.db)]
     whiskbin = bin2d(dat.beh.whisker.motionSVD(:,1), tbin);
     
     %% find PCs
-    [u s v] = svdecon(gpuArray(single(Fbin - mean(Fbin,2))));
-    u = gather(u);
-    s = gather(s);
+    if useGPU
+        [u s v] = svdecon(gpuArray(single(Fbin - mean(Fbin,2))));
+        u = gather(u);
+        s = gather(s);
+    else
+        [u s v] = svdecon(single(Fbin - mean(Fbin,2)));
+    end
     v = Fbin' * u;
     
     %% autocorrelation functions

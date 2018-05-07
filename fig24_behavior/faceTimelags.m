@@ -86,9 +86,7 @@ for d = [1:length(dall.db)]
             [indtrain, indtest] = splitInterleaved(NT, Lblock, fractrain,rseed);
             clf
             itrain = find(indtrain);
-            [a, b] = CanonCor2(gpuArray(v(:,itrain)'), gpuArray(x(:,itrain)'), .05);
-            a      = gather(a);
-            b      = gather(b);
+            [a, b] = CanonCor2(v(:,itrain)', x(:,itrain)', .05);
             
             % prediction of neural activity
             itest  = find(indtest);

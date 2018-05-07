@@ -13,9 +13,10 @@ Carsen Stringer, Marius Pachitariu, Charu Bai Reddy, Matteo Carandini, Kenneth D
 
 Only the main datasets are currently uploaded, which produce figures 1-4. Shortly we will add new datasets for figures 5 and 6. 
 
-The script 'mainFigs.m' calls all figure-producing scripts. While this is useful for reproducing the paper, it does not easily allow building on the main analysis we do, or running these analyses on different data. Therefore, we will add separate scripts to run analyses one at at time, with the data clearly loaded at the top of the script, so you can swap yours in. 
+The script 'mainFigs.m' calls all figure-producing scripts. Set useGPU=0 if you do not have a GPU.
 
-### Analysis one ###
+While this is useful for reproducing the paper, it does not easily allow building on the main analysis we do, or running these analyses on different data. Therefore, we will add separate scripts to run analyses one at at time, with the data clearly loaded at the top of the script, so you can swap yours in. 
+<!---
 
 Sorting by the top principal component.
 
@@ -35,3 +36,4 @@ Predicting a single neuron from its simultaneously-recorded peer using reduced-r
 
 Comparison of population activity from two task conditions, for example spontaneous activity and stimulus presentation. 
  
+--->
