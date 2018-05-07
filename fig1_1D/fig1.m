@@ -4,7 +4,7 @@ load(fullfile(matroot,'corr1stpc.mat'));
 
 %%
 close all;
-default_figure([15 10 6.25 8]);
+default_figure([1 1 6.25 8]);
 
 %%
 %trange = 750+[1:1500];

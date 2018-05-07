@@ -13,7 +13,7 @@ beh = results.beh;
 %%
 
 close all;
-default_figure([14 1 9 5]);
+default_figure([1 1 9 5]);
 
 
 %%

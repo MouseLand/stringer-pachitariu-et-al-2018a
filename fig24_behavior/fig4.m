@@ -15,7 +15,7 @@ close all;
 
 figX = 6;
 figY = 8;
-default_figure([20 8 figX figY]);
+default_figure([1 1 figX figY]);
 %%
 
 yh = .05;

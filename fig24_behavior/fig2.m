@@ -6,7 +6,7 @@ load(fullfile(matroot,'expv_behavior_neurons.mat'));
 
 %%
 close all;
-default_figure([20 10 6 8]);
+default_figure([1 1 6 8]);
 %%
 tstr   = {'running','pupil area', 'whisking', 'running+pupil','running+whisker',...
     'pupil+whisker','running+pupil+whisker'};

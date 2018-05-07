@@ -15,7 +15,7 @@ useGPU = 1;
 %% run analysis for figure 1
 pcAnalysis(dataroot,matroot);
 
-%% run analysis for figure 2 and 4
+%% run analysis for figures 2 and 4
 predictNeuronsFromAllBeh(dataroot,matroot,useGPU);
 quantifyBehavior(dataroot,matroot);
 
@@ -30,6 +30,11 @@ peerExcludeNeighbors(dataroot,matroot,useGPU);
 % slower (we used nseed = 10 in the paper)
 faceTimelags(dataroot,matroot,useGPU);
 
+%% run analysis for figure 6
+sharedVariance(dataroot, matroot, useGPU);
+faceStatistics(dataroot, matroot);
+stimfaceVariance(dataroot,matroot,useGPU);
+
 %% this will produce the figures
 
 fig1(matroot);
@@ -40,4 +45,5 @@ fig3(matroot);
 
 fig4(matroot);
 
+fig6(matroot);
 %% supplementary figures
