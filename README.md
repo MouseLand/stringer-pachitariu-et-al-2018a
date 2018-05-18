@@ -9,11 +9,11 @@ https://www.biorxiv.org/content/early/2018/04/22/306019
 It relies on data deposited on figshare at:
 
 Carsen Stringer, Marius Pachitariu, Charu Bai Reddy, Matteo Carandini, Kenneth D. Harris
-**Recordings of ten thousand neurons in visual cortex during spontaneous behaviors.** https://figshare.com/articles/Recordings_of_ten_thousand_neurons_in_visual_cortex_during_spontaneous_behaviors/6163622
+**Recordings of ten thousand neurons in visual cortex during spontaneous behaviors.** ([link](https://figshare.com/articles/Recordings_of_ten_thousand_neurons_in_visual_cortex_during_spontaneous_behaviors/6163622))
 
-See the data [description](dataSharing.pdf).
+Here's the data [description](dataSharing.pdf).
 
-Only the main datasets are currently uploaded, which produce figures 1-4. Shortly we will add new datasets for figures 5 and 6. 
+The datasets to produce figures 1-4,6 are available. Shortly we will add new datasets for figure 5. 
 
 The script 'mainFigs.m' calls all figure-producing scripts. Set useGPU=0 if you do not have a GPU.
 
