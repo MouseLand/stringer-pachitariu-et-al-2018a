@@ -20,7 +20,7 @@ nn = floor(NN/nC);
 iclust(isort) = ceil([1:NN]/nn);
 iclust(iclust>nC) = nC;
 
-sig = [linspace(3,1,25) 1*ones(1,50)];
+sig = [linspace(nC/10,1,100) 1*ones(1,50)];
 
 for t = 1:numel(sig)
     if useGPU
