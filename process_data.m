@@ -1,5 +1,3 @@
-% change the path to this folder first
-addpath(genpath('.'));
 
 % you should change this to your local data paths
 dataroot = 'C:\DATA\figshare';
@@ -11,6 +9,9 @@ mkdir(matroot)
 
 % do you have a GPU? if not set to 0
 useGPU = 1;
+
+% should be in github folder
+addpath(genpath('.'));
 
 %% this will perform analyses and save output for figures
 
@@ -37,18 +38,3 @@ sharedVariance(dataroot, matroot, useGPU);
 faceStatistics(dataroot, matroot);
 stimfaceVariance(dataroot,matroot,useGPU);
 
-%% this will produce the figures
-
-close all;
-
-fig1(matroot);
-
-fig2(matroot);
-
-fig3(matroot);
-
-fig4(matroot);
-
-fig6(matroot);
-
-%% supplementary figures

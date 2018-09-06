@@ -25,7 +25,7 @@ for d = [1:length(dall.db)]
     fprintf('\nrecording %d\n',d);
     
     % xyz distance
-    pd = ((med(:,1)-med(:,1)').^2 + (med(:,2)-med(:,2)').^2 + (med(:,3)-med(:,3)')).^.5;
+    pd = ((med(:,1)-med(:,1)').^2 + (med(:,2)-med(:,2)').^2 + (med(:,3)-med(:,3)').^2).^.5;
     
     % exclude neurons less than 70 um away
     reps = 100 * (~(pd<70));
