@@ -1,9 +1,9 @@
 
 % you should change this to your local data paths
-dataroot = 'C:\DATA\figshare';
+dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
 
 % give a local folder for saving intermediate data (3GB max)
-matroot = 'D:\DATA\mats\';
+matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
 
 mkdir(matroot)
 
@@ -13,22 +13,27 @@ useGPU = 1;
 % should be in github folder
 addpath(genpath('.'));
 
+% also download rastermap
+% https://github.com/MouseLand/rastermap/
+addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
+
 %% this will perform analyses and save output for figures
 
-%% run analysis for figure 1
+%% run PC analysis
 pcAnalysis(dataroot,matroot, useGPU);
 
-%% run analysis for figures 2 and 4
-predictNeuronsFromAllBeh(dataroot,matroot,useGPU);
-quantifyBehavior(dataroot,matroot);
-
-%% run analysis for figure 3
+%% run rastermap and determine distance-dependence of clusters
 smooth1Dclusters(dataroot,matroot,useGPU);
-% peer prediction is pretty slow (different peers for each neuron)
+
+%% peer prediction is pretty slow (different peers for each neuron)
 % (I've put the mat file in the folder if you want to use it 'PCApred.mat')
 peerExcludeNeighbors(dataroot,matroot,useGPU);
 
-%% run analysis for figure 4 for time delay (panel K)
+%% run behavioral analyses
+predictNeuronsFromAllBeh(dataroot,matroot,useGPU);
+quantifyBehavior(dataroot,matroot);
+
+%% time delay analysis (panel 4K)
 % you can increase nseed in this script to average more but it will be
 % slower (we used nseed = 10 in the paper)
 faceTimelags(dataroot,matroot,useGPU);
