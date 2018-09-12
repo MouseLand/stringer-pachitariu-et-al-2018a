@@ -1,4 +1,4 @@
-function results = predictNeuronsFromAllBeh(dataroot, matroot, useGPU)
+function results = predictNeuronsFromAllBeh(dataroot, matroot, useGPU, dex)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
@@ -8,8 +8,14 @@ clf;
 expv_behavior = NaN*ones(length(ndims0),length(dall.db),10);
 expvPC_behavior = NaN*ones(128,length(ndims0),length(dall.db),10);
 
+% options for clustering (see activityMap.m)
+nC =30;
+ops.nCall = [nC 100]; % number of clusters
+ops.iPC = 1:200; % PCs to use
+ops.useGPU = useGPU; % whether to use GPU
+ops.upsamp = 100; % upsampling factor for the embedding position
+ops.sigUp = 1; % stddev for upsampling
 
-dex = 2;
 %%
 rng('default');
 for d = [1:length(dall.db)]
@@ -162,10 +168,8 @@ for d = [1:length(dall.db)]
         %% sort data by 1D embedding
         if btype == 9
             if d == dex
-                nC=30;
-                [~,isort] = sort(u(:,1));
-                [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort,useGPU);
-                yt = y(isort,indtest);
+                [isort, ~, Sm] = mapTmap(Ff,ops);
+				yt = y(isort,indtest);
                 ytstd = max(1e-3,std(yt,1,2));
                 yt = yt ./ ytstd;
                 yp = yp0(isort,:) ./ ytstd;
@@ -185,10 +189,7 @@ for d = [1:length(dall.db)]
                 xtest{d} = x(1:1000,indtest);
             end
         end
-        
-        
-        
-        
+               
     end
     
     cellpos{d} = med;

@@ -1,7 +1,6 @@
-function results = pcAnalysis(dataroot,matroot, useGPU)
+function results = pcAnalysis(dataroot,matroot, useGPU, dex)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
-dex = 1;
 
 results.runcorr=[];
 results.indist = [];

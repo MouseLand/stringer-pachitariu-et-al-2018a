@@ -9,8 +9,6 @@ tdelay = [-8*3:3:-5 -4:4 5:3:8*3];
 clf;
 expv_tlag = zeros(length(ndims0),length(dall.db),length(tdelay));
 
-
-dex = 2;
 %%
 rng('default');
 for d = [1:length(dall.db)]
@@ -78,7 +76,7 @@ for d = [1:length(dall.db)]
         fractrain = 0.5;
         
         % can increase this to average more over different splits of the data in time
-        nseed = 1; 
+        nseed = 10; 
         
         ndims1 = ndims0(ndims0<=size(x,1) & ndims0<=size(v,1));
             

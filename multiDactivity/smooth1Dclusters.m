@@ -1,10 +1,10 @@
-function smooth1Dclusters(dataroot,matroot,useGPU)
+function smooth1Dclusters(dataroot,matroot,useGPU, dex)
 dall=load(fullfile(dataroot, 'dbspont.mat'));
-dex = 1;
+
 
 % options for clustering (see activityMap.m)
-nC =20;
-ops.nC = nC; % number of clusters
+nC =30;
+ops.nCall = [nC 100]; % number of clusters
 ops.iPC = 1:200; % PCs to use
 ops.useGPU = useGPU; % whether to use GPU
 ops.upsamp = 100; % upsampling factor for the embedding position

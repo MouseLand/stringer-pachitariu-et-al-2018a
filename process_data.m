@@ -1,37 +1,41 @@
 
 % you should change this to your local data paths
-dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
+%dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
+dataroot = 'D:/grive/10krecordings/spont_paper';
 
 % give a local folder for saving intermediate data (3GB max)
-matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
+%matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
+matroot = 'D:/grive/10krecordings/spontResults';
 
 mkdir(matroot)
 
 % do you have a GPU? if not set to 0
-useGPU = 1;
+useGPU = 0;
 
 % should be in github folder
 addpath(genpath('.'));
 
 % also download rastermap
 % https://github.com/MouseLand/rastermap/
-addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
+%addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
+addpath('C:\Users\carse\github\rastermap\matlab');
 
 %% this will perform analyses and save output for figures
+dex = 2; % second dataset as example dataset
 
 %% run PC analysis
-pcAnalysis(dataroot,matroot, useGPU);
+pcAnalysis(dataroot,matroot, useGPU, dex);
 
 %% run rastermap and determine distance-dependence of clusters
-smooth1Dclusters(dataroot,matroot,useGPU);
+smooth1Dclusters(dataroot,matroot,useGPU, dex);
 
 %% peer prediction is pretty slow (different peers for each neuron)
 % (I've put the mat file in the folder if you want to use it 'PCApred.mat')
 peerExcludeNeighbors(dataroot,matroot,useGPU);
 
 %% run behavioral analyses
-predictNeuronsFromAllBeh(dataroot,matroot,useGPU);
-quantifyBehavior(dataroot,matroot);
+predictNeuronsFromAllBeh(dataroot,matroot,useGPU, dex);
+quantifyBehavior(dataroot,matroot, dex);
 
 %% time delay analysis (panel 4K)
 % you can increase nseed in this script to average more but it will be

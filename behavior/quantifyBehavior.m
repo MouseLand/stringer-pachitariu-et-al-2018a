@@ -1,8 +1,7 @@
-function quantifyBehavior(dataroot, matroot)
+function quantifyBehavior(dataroot, matroot, dex)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
-dex = 2;
 cc = [];
 
 %%
