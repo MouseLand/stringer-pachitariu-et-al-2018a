@@ -51,7 +51,7 @@ hp=hs{i}.Position;
 %hp(3)=hp(3)+.035;
 %hp(4)=hp(4)+.035;
 axes('position',hp);
-iplane = 35*5;
+iplane = 35*2;
 icell = find(pc.results.cellmed(:,3)==iplane);
 med = pc.results.cellmed(icell,1:2);
 ctype= pc.results.cellpc(icell);
@@ -159,6 +159,7 @@ cg = repmat(cm,2,1);
 
 i=i+1;
 hs{i}=my_subplot(3,3,7,[xh yh]);
+hs{i}.Position(2)=hs{i}.Position(2)+0.015;
 axis([0.5 7 deps(1)+150 deps(end)+150]);
 ylabel('depth (\mum)');
 set(gca,'Ydir','reverse')
