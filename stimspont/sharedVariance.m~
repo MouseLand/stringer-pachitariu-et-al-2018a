@@ -102,7 +102,7 @@ for d = 1:length(dbs)
     
     usub{1} = uFace;
     usub{2} = uSpont;
-	rbin = bin2d(dat.beh.runSpeed(~tnoface,1),tbin,1);
+    rbin = bin2d(dat.beh.runSpeed(~tnoface,1),tbin,1);
     fbin = bin2d(dat.beh.face.motionSVD(~tnoface,1),tbin,1);
     ybin = bin2d(yall(:,~tnoface),tbin,2);
     
@@ -152,28 +152,24 @@ for d = 1:length(dbs)
 	
 	%% subtract shared and compute stim variance
 	clear Ssub;
-	results.svper = zeros(4,3);
 	for ktype=1:2
 		ushared = results.Ushared{d,ktype};
 		Ssub{ktype} = usub{ktype} - ushared * (ushared'*usub{ktype});
 	end
-	ushared = results.Ushared{d,1};
-	Ssub{3} = normc(sm') - ushared * (ushared'*normc(sm'));
-	for k = 1
+	ushared = results.Ushared
+	Ssub{3} = results.sstim - ushared * (ushared'*results.sstim);
+	A = compute_means(istim,sresp,2,1);
+	A = A(1:end-1,:,:);
+	for k = 1:3
 		ystim = zeros(32,size(Ssub{k},2),2);
 		for j = 1:2
-			ystim(:,:,j) = Astim(:,:,j) * Ssub{k};
+			ystim(:,:,j) = A(:,:,j) * Ssub{k};
 		end
 		%A = A ./ max(1e-6, std(A,1,1));
-		%ystim1 = ystim(:,:,1) - mean(ystim(:,:,1),1);
-		%ystim2 = ystim(:,:,2) - mean(ystim(:,:,2),1);
-		%sv0= corr(ystim(:,:,1),ystim(:,:,2));
-		%results.svmean(d,k) = squeeze(mean(ystim1.*ystim2,1));
-		%results.svstd(d,k) = squeeze(mean(ystim1.*ystim2,1));
-		vnoise = var(ystim(:,:,1) - ystim(:,:,2), 1, 1) / 2;
-		v1     = var(ystim(:,:,1), 1, 1);
-		v2     = var(ystim(:,:,2), 1, 1);
-		disp(mean((v1 + v2 - 2*vnoise) ./ (2*vnoise)));
+		ystim1 = ystim(:,:,1) - mean(ystim(:,:,1),1);
+		ystim2 = ystim(:,:,2) - mean(ystim(:,:,2),1);
+		sv0= corr(ystim(:,:,1),ystim(:,:,2));
+		results.svper(d,k) = squeeze(sum(ystim1.*ystim2,1));
 	end
 	
     %% example dataset
