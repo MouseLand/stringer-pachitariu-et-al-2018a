@@ -21,6 +21,6 @@ Fsp = dat.Fsp(gcell(:),:);
 %%
 [~,ix] = sort(sigvar,'descend');
 
-Fex = single(Fsp(ix(1:2000), :));
+Fex = single(Fsp(ix, :));
 
 save('exResponses.mat','Fex');

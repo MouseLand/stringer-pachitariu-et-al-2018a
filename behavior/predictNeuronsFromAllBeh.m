@@ -3,10 +3,11 @@ function results = predictNeuronsFromAllBeh(dataroot, matroot, useGPU, dex)
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
 ndims0 = [1 2 3 4 8 16 32 64 128];
+npc = 128;
 
 clf;
 expv_behavior = NaN*ones(length(ndims0),length(dall.db),10);
-expvPC_behavior = NaN*ones(128,length(ndims0),length(dall.db),10);
+expvPC_behavior = NaN*ones(npc+1,length(ndims0),length(dall.db),10);
 
 % options for clustering (see activityMap.m)
 nC =30;
@@ -35,7 +36,7 @@ for d = [1:length(dall.db)]
     tdelay = 1; % optimal time delay
     y    = Ff(:,(tdelay+1):end);
     [NN NT] = size(y);
-    disp('>>>>>>>>>>>>> ');
+    fprintf('\nrecording %d\n',d);
     disp([NN NT]);
     
     % 1.2 second bins
@@ -53,8 +54,7 @@ for d = [1:length(dall.db)]
     else
         [u s v] = svdecon(single(y));
     end
-    ncomps  = 128;
-    u       = gather_try(u(:, 1:ncomps));% * s(1:ncomps,1:ncomps));
+    u       = gather_try(u(:, 1:npc));% * s(1:ncomps,1:ncomps));
     v       = u' * y;
     
     NT = size(y,2);
@@ -95,14 +95,13 @@ for d = [1:length(dall.db)]
                 x = x / std(x(:,1));
                 x = [x zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:) wmot],1,1)];
         end
-        
-        
-        
+      
         x    = x * 10;
         x    = x(1:end-(tdelay),:); % apply time delay
         x    = bin2d(x, tbin, 1);
         x    = x';
         
+        % make 1st PC +-correlated with running
         if btype == 1
             cc=corr(v(1,:)',x(:));
             v(1,:) = v(1,:) * sign(cc);
@@ -122,7 +121,6 @@ for d = [1:length(dall.db)]
         
         % prediction of correlation matrix
         expv = [];
-        ntest = 100;
         expvPC=[];
         for k = 1:length(ndims1)
             n=ndims1(k);
@@ -131,7 +129,8 @@ for d = [1:length(dall.db)]
              
             % residuals of PCs
             vres   = v(:,indtest) - vp;
-            expvPC(:,k) = 1 - nanvar(vres,1,2)./nanvar(v(:,indtest),1,2);            
+            expvPC(:,k) = [1 - nanvar(vres,1,2)./nanvar(v(:,indtest),1,2);...
+                           1 - nanmean(nanvar(vres,1,2))/nanmean(nanvar(v(:,indtest),1,2))] ;            
             
             % residuals of neurons
             yp     = u * vp;% + mean(y(:,:),2);
@@ -141,6 +140,7 @@ for d = [1:length(dall.db)]
         yp0=yp;
         semilogx(ndims1,expv,'*-');
         hold all;
+        semilogx(ndims1,expvPC(end,:),'^-');
         %ylim([0 1]);
         title(max(expv));%dat{d}.db.expt_name{1});
         %ylim([0 .1])
@@ -149,9 +149,7 @@ for d = [1:length(dall.db)]
         drawnow;
         
         expv_behavior(1:length(ndims1),d,btype) = expv;
-        expvPC_behavior(:,1:length(ndims1),d,btype) = expvPC;
-        
-        
+        expvPC_behavior(:,1:length(ndims1),d,btype) = expvPC;        
         
         %%
         if btype == 7
@@ -161,7 +159,6 @@ for d = [1:length(dall.db)]
             xtest1d{d} = x(:,indtest);
             n1d(:,d) = a(:,1);
             umat{d} = u;
-            
             ccarousal{d} = corr(y',x');
         end
         

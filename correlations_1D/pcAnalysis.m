@@ -84,37 +84,9 @@ for d = [1:length(dall.db)]
     if d == dex
         results.behavior = [runbin(:) pupilbin(:) whiskbin(:)];
         results.firstpcs  = v(:,1:3);
-        results.spks = Fbin(ix,:);
+        results.spks = Ff(ix,:);
     end
-    
-            
-    %% spatial distribution of 1st PC
-    rcells = zeros(NN,1);
-    rcells(u(:,1)>0) = 1;
-    rcells(u(:,1)<0) = 2;
-    % indist: distance between cells of same sign of u(:,1)
-    % indist: distance between cells of different sign of u(:,1)
-    for j = 1:2
-        indsj       = find(rcells==j);
-        nindsj      = find(rcells~=j);
-        results.indist(j,d)   = nanmean(nanmean(dists(indsj,indsj)));
-        results.outdist(j,d)  = nanmean(nanmean(dists(nindsj,indsj)));
-    end
-    
-    % change sign based on running correlation
-    bcells = rcells;
-    if results.runcorr(d) < 0
-        bcells(rcells==1) = 2;
-        bcells(rcells==2) = 1;
-    end
-    
-    results.pcdist(d) = sum(bcells==1) / (sum(bcells==1) + sum(bcells==2));
-    
-    if d == dex
-        results.cellmed = med;
-        results.cellpc  = bcells;
-    end
-    
+                
     %% distribution of correlations and repeatability
     
     % mean and standard deviation of all correlations

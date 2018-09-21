@@ -1,13 +1,9 @@
-function fig4(matroot)
+function fig2new(matroot)
 
 load('exampleMovie.mat');
 load(fullfile(matroot,'example_behavior.mat'));
+load(fullfile(matroot,'PCpredict.mat'));
 load(fullfile(matroot,'expv_behavior_neurons.mat'));
-try
-    load(fullfile(matroot,'PCApred.mat'));
-catch
-    load('PCApred.mat');
-end
 try
     load(fullfile(matroot,'expv_timedelay.mat'));
 catch
@@ -136,7 +132,6 @@ axis tight;
 axis off;
 text(0,1.2,'motion energy PCs','fontsize',8);
 text(1.95,1.2,'neural PCs','fontsize',8);
-text(3.05,1.2,'neurons','fontsize',8);
 
 h2=my_subplot(5,3,6,[.8 .6]);
 h2.Position(1) = h2.Position(1) - .14;
@@ -184,34 +179,6 @@ end
 axis tight;
 axis off;
 
-
-pos(1) = h2.Position(1)+h2.Position(3)*.95;
-% ------------- ball array of neurons ---------%
-xb0 = pos(1)+.015;
-yb0 = pos(2)-.0;
-pos(3)=.08;
-axes('position',[xb0 yb0 pos(3:4)]);
-hold all;
-ny = 10;
-for j = 1
-    for k = 1:ny
-        xb=(j-1);
-        yb=(k-1);
-        if j==1
-            for m = 1:nPCs
-                yp = (ny-1)/3 * (m-1);
-                plot([-4 xb],[yp yb],'k','linewidth',1);
-            end
-            %text(0.,3,'neurons','fontsize',12);
-        end
-        plot(xb,yb,'ko','markerfacecolor','w','linewidth',2,'color','k',...
-            'markersize',7);
-        
-    end
-end
-axis tight;
-axis off;
-
 % --------------------- DIMS VS VAR EXP -------------- %
 i=i+1;
 hs{i} = my_subplot(5,4,9,[.7 .7]);
@@ -219,22 +186,23 @@ hs{i}.Position(1) = hs{i}.Position(1) + .04;
 hs{i}.Position(2) = hs{i}.Position(2)+.01;
 %hs{i}.Position(2) = hs{i-1}.Position(2);
 for j = 1:ndat
-    semilogx(ndims0,expv_behavior(:,j,9),'color',cdat(j,:));
+    semilogx(ndims0,expvPC_behavior(end,:,j,9),'color',cdat(j,:));
     hold all;
 end
 box off;
 set(gca,'xtick',[1 4 16 64]);
-xlabel('dimensions');
+xlabel('rank');
 ylabel({'variance explained','(test set)'});
 axis tight;
-ylim([0 .15]);
+ylim([0 .28]);
 xlim([0 128]);
 hold all;
-semilogx(ndims0,mean(expv_behavior(:,:,9),2),'k','linewidth',2);
+semilogx(ndims0,mean(squeeze(expvPC_behavior(end,:,:,9)),2),'k','linewidth',2);
 axis square;
 grid on;
 grid minor;
 grid minor;
+title('PC 1-128','fontweight','normal');
 
 % ------------ PC VAR EXP ------------%
 i=i+1;
@@ -242,16 +210,20 @@ hs{i} = my_subplot(5,4,13,[.7 .7]);
 hs{i}.Position(1) = hs{i}.Position(1) + .04;
 hs{i}.Position(2) = hs{i}.Position(2)+.01;
 for j = 1:ndat
-	semilogx([1:128],expvPC_behavior(:,6,j,9),'color',cdat(j,:))
+	semilogx([1:128],expvPC_behavior(1:end-1,6,j,9),'color',cdat(j,:))
 	hold all;
 end
-semilogx([1:128],mean(expvPC_behavior(:,6,:,9),3),'k','linewidth',2);
+semilogx([1:128],mean(expvPC_behavior(1:end-1,6,:,9),3),'k','linewidth',2);
+semilogx([1:128],mean(expvPC(1:128,:),2),'color',.8*[1 1 1],'linewidth',2);
 %axis([0 .06 0 .06]);
 set(gca,'xtick',10.^[0 1 2])
 ylabel({'variance explained','(test set)'});
+text(.6,.9,'peer PC','color',.8*[1 1 1])
 xlabel('PC dimension');
 box off;
 axis square;
+axis tight;
+ylim([-.1 1]);
 grid on;
 grid minor;
 grid minor;
@@ -312,7 +284,8 @@ yh=.6;
 %-------------- PEER PRED -----------------%
 i=i+1;
 hs{i}=my_subplot(5,4,17,[xh yh]);
-ev = [max(expv_neurons)' (expv_behavior(6,:,9))'];
+expvPCcum = cumsum(expvPCCov)./cumsum(expvPCVar);
+ev = [expvPCcum(128,:)' squeeze(expvPC_behavior(end,6,:,9))];
 hold all;
 for j = 1:size(ev,1)
     plot(ev(j,1), ev(j,2), 'wo',...
@@ -322,8 +295,8 @@ plot([0 30],[0 30],'k','linewidth',1)
 axis square;
 box off;
 ylabel('weights');
-ylim([0 .30])
-xlim([0 .30]);
+ylim([0 .80])
+xlim([0 .8]);
 ylabel({'face'});
 xlabel({'peer prediction'});
 %ht=title({'% variance explained',''},'fontsize',8);
@@ -331,7 +304,7 @@ xlabel({'peer prediction'});
 grid on;
 grid minor;
 grid minor;
-
+title('PC 1-128','fontweight','normal');
 
 % ------------ FACE (16D) vs arousal ------------%
 i=i+1;
@@ -339,10 +312,10 @@ hs{i} = my_subplot(5,4,18,[xh yh]);
 hold all;
 plot([0 15],[0 15],'k');
 for j = 1:ndat
-    plot(expv_behavior(3,j,7), expv_behavior(6,j,9),'wo',...
+    plot(expvPC_behavior(end,3,j,7), expvPC_behavior(end,6,j,9),'wo',...
         'markerfacecolor',cdat(j,:),'markersize',5);
 end
-axis([0 .15 0 .15]);
+axis([0 .3 0 .3]);
 ylabel('face');
 xlabel('run+pupil+whisk (3D)');
 box off;
@@ -350,7 +323,7 @@ axis square;
 grid on;
 grid minor;
 grid minor;
-
+title('PC 1-128','fontweight','normal');
 
 % ------------ FACE (16D) + arousal ------------%
 i=i+1;
@@ -358,10 +331,10 @@ hs{i} = my_subplot(5,4,19,[xh yh]);
 hold all;
 plot([0 15],[0 15],'k');
 for j = 1:ndat
-    plot(expv_behavior(6,j,10), expv_behavior(6,j,9),'wo',...
+    plot(expvPC_behavior(end,6,j,10), expvPC_behavior(end,6,j,9),'wo',...
         'markerfacecolor',cdat(j,:),'markersize',5);
 end
-axis([0 .15 0 .15]);
+axis([0 .3 0 .3]);
 ylabel('face');
 xlabel('face+3D arousal');
 box off;
@@ -369,29 +342,12 @@ axis square;
 grid on;
 grid minor;
 grid minor;
+title('PC 1-128','fontweight','normal');
 
-
-
-% ---------- TIMELAG --------%
 i=i+1;
 hs{i} = my_subplot(5,4,20,[xh yh]);
-tlag = tdelay*.4;
-for j = 1:ndat
-    plot(tlag, squeeze(expv_tlag(6,j,:)),'color',cdat(j,:));
-    hold all;
-end
-plot(tlag,squeeze(mean(expv_tlag(6,:,:),2)),'k','linewidth',2);
-axis tight;
-xlabel('time from behavior (s)');
-ylabel({'variance explained'});
-%axis([-7*1.2 10 0 13])
-ylim([0 .15]);
-box off;
-axis square;
-grid on;
-grid minor;
-grid minor;
-
+xlabel('timelag analysis')
+title('PC 1-128','fontweight','normal');
 
 
 % -------------- LETTERS
@@ -435,3 +391,25 @@ tli = interp1(tlag,tl,[-8:.01:8]);
 
 fwhm = (800-ix1+ix2)*.01
 
+%%
+
+
+% ---------- TIMELAG --------%
+i=i+1;
+hs{i} = my_subplot(5,4,20,[xh yh]);
+tlag = tdelay*.4;
+for j = 1:ndat
+    plot(tlag, squeeze(expv_tlag(6,j,:)),'color',cdat(j,:));
+    hold all;
+end
+plot(tlag,squeeze(mean(expv_tlag(6,:,:),2)),'k','linewidth',2);
+axis tight;
+xlabel('time from behavior (s)');
+ylabel({'variance explained'});
+%axis([-7*1.2 10 0 13])
+ylim([0 .15]);
+box off;
+axis square;
+grid on;
+grid minor;
+grid minor;

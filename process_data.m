@@ -1,3 +1,4 @@
+clear all
 
 % you should change this to your local data paths
 dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
@@ -20,8 +21,9 @@ addpath(genpath('.'));
 addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
 %addpath('C:\Users\carse\github\rastermap\matlab');
 
-%% this will perform analyses and save output for figures
 dex = 2; % second dataset as example dataset
+
+%% this will perform analyses and save output for figures
 
 %% run PC analysis
 pcAnalysis(dataroot,matroot, useGPU, dex);
@@ -29,8 +31,12 @@ pcAnalysis(dataroot,matroot, useGPU, dex);
 %% run rastermap and determine distance-dependence of clusters
 smooth1Dclusters(dataroot,matroot,useGPU, dex);
 
-%% peer prediction is pretty slow (different peers for each neuron)
+%% predict PCs from each other
+peerPC_CCA(dataroot, matroot, useGPU, dex);
+
+%% peer prediction for neurons is pretty slow (different peers for each neuron)
 % (I've put the mat file in the folder if you want to use it 'PCApred.mat')
+% (this is only in a supplementary fig)
 peerExcludeNeighbors(dataroot,matroot,useGPU);
 
 %% run behavioral analyses

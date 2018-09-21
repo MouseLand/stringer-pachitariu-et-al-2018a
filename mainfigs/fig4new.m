@@ -6,12 +6,12 @@ load(fullfile(matroot,'stimfaceRepresentation.mat'));
 load(fullfile(matroot,'exResponses.mat'));
 
 %%
-default_figure([1 1 9 8.5]);
+default_figure([1 1 8 8.5]);
 
 %%
 rng('default');
 kt = 1; % face prediction
-tpts = .645e4 + [1:.92e4];%2.09e4;
+tpts = .645e4 + .03e4 + [1:.85e4];%2.09e4;
 
 dx = .25;
 dy = .5;
@@ -36,8 +36,8 @@ clear hs;
 i=0;
 
 i=i+1;
-hs{i} = my_subplot(2,3,1,[.95 .85]);
-hs{i}.Position(1) = hs{i}.Position(1) +.04;
+hs{i} = my_subplot(2,2,1,[.85 .8]);
+hs{i}.Position(1) = hs{i}.Position(1) -.0;
 hs{i}.Position(2) = hs{i}.Position(2) +.01;
 hold all;
 cpc = colormap('winter');
@@ -74,7 +74,8 @@ cm = colormap('hot');
 cm = cm(32+[1:4:4*4],:);
 
 i=i+1;
-hs{i} = my_subplot(6,5,3,[.55 .7]);
+hs{i} = my_subplot(4,6,4,[.55 .45]);
+hs{i}.Position(2) = hs{i}.Position(2) +.02;
 loglog([1e-3 1],[1e-3 1],'k','linewidth',.5)
 hold all;
 for j = 1:4
@@ -87,29 +88,33 @@ box off;
 axis tight;
 set(gca,'ytick',10.^[-2:0],'yticklabel',{'0.01','0.1','1'},...
     'xtick',10.^[-2:0],'xticklabel',{'0.01','0.1','1'});
-ylabel({'spont periods'});
-xlabel('stim periods');
+ylabel({'spont periods'},'fontsize',8);
+xlabel('stim periods','fontsize',8);
 %title('% variance of PCs','fontweight','normal','fontangle','italic','fontsize',10)
 axis square;
 
 i=i+1;
-hs{i} = my_subplot(6,5,4,[.55 .7]);
+hs{i} = my_subplot(4,6,5,[.55 .45]);
+hs{i}.Position(2) = hs{i}.Position(2) +.02;
 hs{i}.Position(1) = hs{i}.Position(1) +.01;
-hs{i}.Position(2) = hs{i}.Position(2) +.0;
 hold all;
 for j = 1:size(Vshared,2)
-    plot(Vshared(:,j,1)*100,'.-','markersize',12,'color',cm(j,:),'linewidth',.5)
+    plot(Vshared(1:10,j,1)*100,'.-','markersize',8,'color',cm(j,:),'linewidth',.25)
 end
 box off;
-ylabel({'% stim variance'});
-xlabel('dimension');
+ylabel({'% stim variance'},'fontsize',8);
+xlabel('dimension','fontsize',8);
 %title('stim-face subspace','fontweight','normal','fontangle','italic','fontsize',10)
 axis square;
+axis tight;
+ylim([0 15]);
+set(gca,'xtick',[1 5 10]);
 
 
 i=i+1;
-hs{i} = my_subplot(6,5,5,[.55 .7]);
-hs{i}.Position(2) = hs{i}.Position(2) +.0;
+hs{i} = my_subplot(4,6,6,[.55 .45]);
+hs{i}.Position(2) = hs{i}.Position(2) +.02;
+hs{i}.Position(1) = hs{i}.Position(1) +.01;
 hold all;
 for j = 1:size(Ushared,1)
     uplot = Ushared{j,kt};
@@ -120,15 +125,16 @@ for j = 1:size(Ushared,1)
 end
 box off;
 xlim([-.02 .035]);
-ylabel('fraction');
-xlabel('neural weights');
+ylabel('fraction','fontsize',8);
+xlabel('neural weights','fontsize',8);
 %title('1st PC weights','fontweight','normal','fontangle','italic','fontsize',10)
 axis square;
 
 i=i+1;
-hs{i} = my_subplot(3,2,4,[.9 .9]);
-hs{i}.Position(1)=hs{i-3}.Position(1);
-hs{i}.Position(2)=hs{i}.Position(2)+.13;
+hs{i} = my_subplot(4,2,4,[1.2 1.2]);
+%hs{i}.Position(1)=hs{i-3}.Position(1);
+hs{i}.Position(2)=hs{i}.Position(2)+.05;
+hs{i}.Position(1)=hs{i}.Position(1)+.03;
 axis off;
 im=imread('schematicNEW.png');
 image(im);
@@ -140,15 +146,15 @@ kt = 1; % use face projections
 tshared1 = tshared{kt} * sign(mean(Ushared{1,kt}));
 tshared2 = tshared{2} * sign(mean(Ushared{2,2}));
 i=i+1;
-hs{i} = my_subplot(2,2,3,[.9 .65]);
+hs{i} = my_subplot(2,2,3,[.85 .75]);
 hs{i}.Position(1) = hs{1}.Position(1);
-hs{i}.Position(2) = hs{i}.Position(2)-.01;
-hs{i}.Position(3) = .5;
+hs{i}.Position(2) = hs{i}.Position(2)+.03;
+%hs{i}.Position(3) = .5;
 dobin=1;
 tproj1=tprojS{1}(1:3,:);
-tproj1(1,:) = tproj1(1,:)*-1;
-tproj1(3,:) = tproj1(3,:)*-1;
+tproj1= sign(skewness(tproj1,1,2)) .* tproj1;
 tproj2=tprojS{2}(1:3,:);
+tproj2= sign(skewness(tproj2,1,2)) .* tproj2;
 fig_traces(sprojS{kt}(1:5,tpts),tshared1(tpts),tproj1(:,tpts),tshared2(tpts),tproj2(:,tpts),cs,dobin);
 axes('position',[hs{i}.Position(1) hs{i}.Position(2)-yh hs{i}.Position(3) yh*.8]);
 fig_stimon(stimtpt(tpts),0);
@@ -162,23 +168,119 @@ axis off;
 axis tight;
 
 
+dx = .7;
+dy = .65;
+i=i+1;
+cm = [1 .5 .7; .6 0 .6; .3 .3 1];
+hs{i}=my_subplot(6,4,15,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)-.01;
+hold all;
+for k = 1:3
+    plot(vsigstimspont(:,k,3,1),'color',cm(k,:))
+end
+axis square;
+axis tight;
+box off;
+ylabel('variance');
+xlabel('dimension');
+title('stim-only','fontweight','normal');
+ylim([0 max(reshape(vsigstimspont(:,:,3,1),[],1))])
+text(1.2,.6,'signal variance','color',cm(1,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
+text(1.2,.9,'stim periods','color',cm(2,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
+text(1.2,.75,'spont periods','color',cm(3,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
+
+i=i+1;
+hs{i}=my_subplot(6,4,15+4,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
+hold all;
+for k = 1:3
+    plot(vsigstimspont(:,k,1,1),'color',cm(k,:))
+end
+axis square;
+axis tight;
+box off;
+title('face-only','fontweight','normal')
+
+i=i+1;
+hs{i}=my_subplot(6,4,15+8,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)-.01;
+hold all;
+for k = 1:3
+    plot(vsigstimspont(:,k,2,1),'color',cm(k,:))
+end
+axis square;
+axis tight;
+box off;
+title('spont-only','fontweight','normal')
+
+dx = .7;
+dy = .65;
+i=i+1;
+cm = [1 .4 .5; .6 0 .6; .3 .3 1];
+hs{i}=my_subplot(6,4,16,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)-.01;
+hold all;
+for k = 1:3
+    shadedErrorBar([1:32],mean(vsigstimspont(:,k,3,:),4),std(vsigstimspont(:,k,3,:),1,4)/sqrt(3),{'color',cm(k,:)})
+end
+axis square;
+axis tight;
+box off;
+ylabel('variance');
+xlabel('dimension');
+title('stim-only','fontweight','normal');
+ylim([0 max(reshape(vsigstimspont(:,:,3,1),[],1))])
+
+i=i+1;
+hs{i}=my_subplot(6,4,16+4,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
+hold all;
+for k = 1:3
+    shadedErrorBar([1:32],mean(vsigstimspont(:,k,1,:),4),std(vsigstimspont(:,k,1,:),1,4)/sqrt(3),{'color',cm(k,:)})
+end
+axis square;
+axis tight;
+box off;
+title('face-only','fontweight','normal')
+
+i=i+1;
+hs{i}=my_subplot(6,4,16+8,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)-.01;
+hold all;
+for k = 1:3
+    shadedErrorBar([1:32],mean(vsigstimspont(:,k,2,:),4),std(vsigstimspont(:,k,2,:),1,4)/sqrt(3),{'color',cm(k,:)})
+end
+axis square;
+axis tight;
+box off;
+title('spont-only','fontweight','normal')
+
+
+
 tstr{1} = 'Behavior and neural activity with/without visual stimulation';
 tstr{2} = 'Variance of face PCs';
-tstr{3} = 'Stim-face dimensions';
+tstr{3} = 'Stim-face PCs';
 tstr{4} = 'Top dimension';
 tstr{5} = '';
 tstr{6} = 'Projections of neural activity';
+for k = 7:length(hs)
+    tstr{k} = '';
+end
 
 % -------------- LETTERS
 hp=.05;
 hy=1.22;
 deffont=8;
 for j = [1:length(hs)]
-    if j ==1
+    if j ==1 || j==6
         hp0 =.04;
         hy0 = 1.06;
-    elseif j==5 || j==6 || j==length(hs)
-        hy0=1.08;
+    elseif j==5 
+        hy0=.95;
+        hp0 = -0.08;
+    elseif j>6
+        hy0=hy;
+        hp0=.03;
     else
         hp0=hp;
         hy0 = hy;

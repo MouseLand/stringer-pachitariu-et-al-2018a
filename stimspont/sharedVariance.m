@@ -48,7 +48,7 @@ for d = 1:length(dbs)
 
     x    = bin2d(x, tbin, 1);
     x    = x';
-    y    = bin2d(y, tbin, 2);
+    ybin    = bin2d(y, tbin, 2);
     
     % take SVD of neural activity
     if useGPU
@@ -58,7 +58,7 @@ for d = 1:length(dbs)
     end
     ncomps  = 128;
     u       = gather_try(u(:, 1:ncomps));
-    v       = u' * y;
+    v       = u' * ybin;
     
     NT = size(y,2);
     Lblock = round(75);
@@ -68,7 +68,7 @@ for d = 1:length(dbs)
     %% compute face to neural vectors during spontaneous periods
     % low rank regression
     % best with a time delay of 1 frame
-    [a, b] = CanonCor2(y(:,1:end-1)', x(:,2:end)', 2e3);
+    [a, b] = CanonCor2(ybin(:,1:end-1)', x(:,2:end)', 2e3);
     % face vectors
     uFace = normc(a(:,1:32));
     
@@ -159,21 +159,42 @@ for d = 1:length(dbs)
 	end
 	ushared = results.Ushared{d,1};
 	Ssub{3} = normc(sm') - ushared * (ushared'*normc(sm'));
-	for k = 1
-		ystim = zeros(32,size(Ssub{k},2),2);
-		for j = 1:2
-			ystim(:,:,j) = Astim(:,:,j) * Ssub{k};
-		end
+    [u,s,v] = svdecon(Ssub{3}-mean(Ssub{3},2));
+    Ssub{3} = u;
+    ytrain = [];
+    ytest=[];
+    for isti = 1:32
+        isa = find(dat.stim.istim==isti);
+        iss = randperm(numel(isa));
+        iss = isa(iss);
+        ni = numel(iss);
+        ytrain = cat(1,ytrain,sresp(iss(1:floor(ni/2)),:));
+        ytest = cat(1,ytest,sresp(iss(floor(ni/2)+[1:floor(ni/2)]),:));
+    end
+    clf;
+    for k = 1:3
+        ystim = zeros(size(ytest,1),size(Ssub{k},2),2);
+		ystim(:,:,1) = ytrain * Ssub{k};
+        ystim(:,:,2) = ytest * Ssub{k};
+        yspont = y' * Ssub{k};
 		%A = A ./ max(1e-6, std(A,1,1));
 		%ystim1 = ystim(:,:,1) - mean(ystim(:,:,1),1);
 		%ystim2 = ystim(:,:,2) - mean(ystim(:,:,2),1);
 		%sv0= corr(ystim(:,:,1),ystim(:,:,2));
 		%results.svmean(d,k) = squeeze(mean(ystim1.*ystim2,1));
 		%results.svstd(d,k) = squeeze(mean(ystim1.*ystim2,1));
-		vnoise = var(ystim(:,:,1) - ystim(:,:,2), 1, 1) / 2;
-		v1     = var(ystim(:,:,1), 1, 1);
-		v2     = var(ystim(:,:,2), 1, 1);
-		disp(mean((v1 + v2 - 2*vnoise) ./ (2*vnoise)));
+		vsignal = mean(ystim(:,:,1).*ystim(:,:,2));
+		vstim      =  0.5 * (var(ystim(:,:,1), 1, 1) + var(ystim(:,:,2), 1, 1));
+		vspont     = var(yspont, 1, 1);
+        
+        subplot(1,3,k),
+        hold all;
+        plot(vsignal)
+        plot(vstim)
+        plot(vspont)
+        axis tight;
+        drawnow;
+        results.vsigstimspont(:,:,k,d) = [vsignal' vstim' vspont'];
 	end
 	
     %% example dataset
