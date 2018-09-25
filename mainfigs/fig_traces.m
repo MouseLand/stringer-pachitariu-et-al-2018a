@@ -1,4 +1,4 @@
-function fig_traces(sproj,tshared,tproj,tshared2,tproj2,cm,dobin)
+function fig_traces(sproj,tshared,tproj,tshared2,tproj2,cm,dobin,titles)
 
 if dobin
     tshared = bin2d(tshared(:),4);
@@ -45,14 +45,14 @@ for j = 1:size(tproj2,1)
 end
 
 
-ht=text(-.04,.8,{'stim-only'},'horizontalalignment','center','fontsize',8,'color',[.8 .3 .8],...
+ht=text(-.04,.8,titles{1},'horizontalalignment','center','fontsize',8,'color',[.8 .3 .8],...
     'fontangle','normal');
 ht.Rotation = 90;
 
-ht=text(-.04,.1,{'spont-only'},'horizontalalignment','center','fontsize',8,'fontangle','normal');
+ht=text(-.04,.1,titles{2},'horizontalalignment','center','fontsize',8,'fontangle','normal');
 ht.Rotation = 90;
 
-ht=text(-.04,.42,{'face-only'},'horizontalalignment','center','fontsize',8,'fontangle','normal',...
+ht=text(-.04,.42,titles{3},'horizontalalignment','center','fontsize',8,'fontangle','normal',...
     'color','k');
 ht.Rotation = 90;
 

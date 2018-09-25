@@ -26,7 +26,12 @@ for d = 1:length(dbs)
     %A = A ./ max(1e-6, std(A,1,1));
     ystim1 = ystim(:,:,1) - mean(ystim(:,:,1),1);
     ystim2 = ystim(:,:,2) - mean(ystim(:,:,2),1);
+    % average over neurons
     sv0= corr(ystim(:,:,1),ystim(:,:,2));
+    nstim = size(ystim,1);
+    results.svall{d} = 2 * mean(sum(ystim1.*ystim2,1)) ...
+                        / (mean(sum(ystim1.^2,1)) + mean(sum(ystim2.^2,1)));
+    disp(results.svall{d});
     results.sv{d} = diag(sv0);
     results.svraw{d} = squeeze(sum(ystim1.*ystim2,1));
     
@@ -50,6 +55,11 @@ for d = 1:length(dbs)
     end
     %A = cat(3,ytrain,ytest);
     results.sv1rep{d} = diag(corr(ytrain,ytest));
+    ytrain = ytrain-mean(ytrain,1);
+    ytest  = ytest-mean(ytest,1);
+    results.sv1repall{d} = 2 * mean(sum(ytrain .* ytest,1)) ...
+                        / (mean(sum(ytrain.^2,1)) + mean(sum(ytest.^2,1)));
+    disp(results.sv1repall{d})
     vnoise = var(A(:,:,1) - A(:,:,2), 1, 1) / 2;
     v1     = var(A(:,:,1), 1, 1);
     v2     = var(A(:,:,2), 1, 1);
@@ -82,6 +92,9 @@ for d = 1:length(dbs)
     % time delay
     x    = x(:, 2:end);
     y    = y(:, 1:end-1);
+    % normalize x
+    x = x - mean(x,1);
+    x = x / std(x(:,1));
     NT   = size(y,2);
     
     % divide into train and test 
@@ -101,7 +114,7 @@ for d = 1:length(dbs)
   
     %% compute face to neural projections from spont blocks
     % low rank regression
-    [a, b] = CanonCor2((v(:,indtrain)'), (x(:,indtrain))',2e3);%1e3);
+    [a, b] = CanonCor2((v(:,indtrain)'), (x(:,indtrain))',0.5);%1e3);
     a      = gather(a);
     b      = gather(b);
     
@@ -129,8 +142,8 @@ for d = 1:length(dbs)
     
     drawnow;
     
-    results.facevar{d} = max(expv_neurons,[],2);
-    results.ev(d) = max(expv);
+    results.facevar{d} = expv_neurons(:,ndims0==16);
+    results.ev(d) = expv(ndims0==16);
    
     %% compute 1D embeddings of face and stimulus spaces
     nC = 32;

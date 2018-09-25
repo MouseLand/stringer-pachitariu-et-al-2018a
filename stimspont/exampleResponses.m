@@ -23,4 +23,4 @@ Fsp = dat.Fsp(gcell(:),:);
 
 Fex = single(Fsp(ix, :));
 
-save('exResponses.mat','Fex');
+save(fullfile(matroot,'exResponses.mat'),'Fex');

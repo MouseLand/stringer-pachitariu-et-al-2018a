@@ -34,21 +34,21 @@ for d = 1:length(dbs)
     [NN NT] = size(y);
     fprintf('recording %d\n',d);
 
+    % bin spikes and behavior in 1.2 second bins
+    tbin = 3;
+    
+    x    = bin2d(x, tbin, 1);
+    x    = x';
+    x = x - mean(x,1);
+    x = x / std(x(:,1));
+    
+    y    = bin2d(y, tbin, 2);
+        
     % subtract mean and divide by std before binning
     ysub = mean(y,2);
     ystd = 1e-6 + std(y,1,2);
     y    = (y - ysub)./ystd;
     
-    % bin spikes and behavior in 1.2 second bins
-    if dbs(d).nplanes == 10
-        tbin = 4;
-    else
-        tbin = 3;
-    end
-
-    x    = bin2d(x, tbin, 1);
-    x    = x';
-    ybin    = bin2d(y, tbin, 2);
     
     % take SVD of neural activity
     if useGPU
@@ -58,7 +58,6 @@ for d = 1:length(dbs)
     end
     ncomps  = 128;
     u       = gather_try(u(:, 1:ncomps));
-    v       = u' * ybin;
     
     NT = size(y,2);
     Lblock = round(75);
@@ -68,7 +67,7 @@ for d = 1:length(dbs)
     %% compute face to neural vectors during spontaneous periods
     % low rank regression
     % best with a time delay of 1 frame
-    [a, b] = CanonCor2(ybin(:,1:end-1)', x(:,2:end)', 2e3);
+    [a, b] = CanonCor2(y(:,1:end-1)', x(:,2:end)', 0.5);
     % face vectors
     uFace = normc(a(:,1:32));
     
@@ -158,31 +157,33 @@ for d = 1:length(dbs)
 		Ssub{ktype} = usub{ktype} - ushared * (ushared'*usub{ktype});
 	end
 	ushared = results.Ushared{d,1};
-	Ssub{3} = normc(sm') - ushared * (ushared'*normc(sm'));
-    [u,s,v] = svdecon(Ssub{3}-mean(Ssub{3},2));
-    Ssub{3} = u;
-    ytrain = [];
+	ytrain = [];
     ytest=[];
+    istims=[];
+    yf = zeros(32,NN);
     for isti = 1:32
         isa = find(dat.stim.istim==isti);
         iss = randperm(numel(isa));
         iss = isa(iss);
         ni = numel(iss);
-        ytrain = cat(1,ytrain,sresp(iss(1:floor(ni/2)),:));
-        ytest = cat(1,ytest,sresp(iss(floor(ni/2)+[1:floor(ni/2)]),:));
+        ytrain = cat(1,ytrain,sresp(iss(1:floor(ni/3)),:));
+        ytest = cat(1,ytest,sresp(iss(floor(ni/3)+[1:floor(ni/3)]),:));
+        yf(isti,:) = mean(sresp(iss(floor(2*ni/3)+[1:floor(ni/3)]),:),1);
+        istims = cat(1,istims,isti*ones(floor(ni/3),1));
     end
+    usub{3} = normc(yf');
+    Ssub{3} = usub{3} - ushared * (ushared'*usub{3});
+    [u,s,v] = svdecon(Ssub{3}-mean(Ssub{3},2));
+    Ssub{3} = u;
+    %[u,s,v] = svdecon(usub{3}-mean(usub{3},2));
+    %usub{3} = u;
+    
     clf;
     for k = 1:3
         ystim = zeros(size(ytest,1),size(Ssub{k},2),2);
 		ystim(:,:,1) = ytrain * Ssub{k};
         ystim(:,:,2) = ytest * Ssub{k};
         yspont = y' * Ssub{k};
-		%A = A ./ max(1e-6, std(A,1,1));
-		%ystim1 = ystim(:,:,1) - mean(ystim(:,:,1),1);
-		%ystim2 = ystim(:,:,2) - mean(ystim(:,:,2),1);
-		%sv0= corr(ystim(:,:,1),ystim(:,:,2));
-		%results.svmean(d,k) = squeeze(mean(ystim1.*ystim2,1));
-		%results.svstd(d,k) = squeeze(mean(ystim1.*ystim2,1));
 		vsignal = mean(ystim(:,:,1).*ystim(:,:,2));
 		vstim      =  0.5 * (var(ystim(:,:,1), 1, 1) + var(ystim(:,:,2), 1, 1));
 		vspont     = var(yspont, 1, 1);
@@ -195,12 +196,12 @@ for d = 1:length(dbs)
         axis tight;
         drawnow;
         results.vsigstimspont(:,:,k,d) = [vsignal' vstim' vspont'];
-	end
-	
+    end
+        
     %% example dataset
     if d == 1
-        results.sstim = normc(sm');
-        results.sprojF = normc(sm')' * yall;
+        results.sstim = normc(yf');
+        results.sprojF = normc(yf')' * yall;
         
         for ktype=1:2
             results.tprojF{ktype} = usub{ktype}' * yall;
@@ -210,12 +211,20 @@ for d = 1:length(dbs)
             stimsub = results.sstim - ushared * (ushared'*results.sstim);
             spontsub = usub{ktype} - ushared * (ushared'*usub{ktype});
             
-            
+            % projections onto all activity
             results.sprojS{ktype} = stimsub' * yall;
             results.tprojS{ktype} = spontsub' * yall;
-            
             results.tshared{ktype} = ushared' * yall;
+                        
         end
+        % projections onto stims (without subtraction)
+        results.istims = [istims; istims];
+        for k = 1:2
+            results.projstim{k} =  [ytrain; ytest] * Ssub{k};
+        end
+        results.projstim{3} =  [ytrain; ytest] * (usub{3} - results.Ushared{d,1} * (results.Ushared{d,1}'*usub{3}));
+        results.projstim{4} = [ytrain; ytest] * results.Ushared{d,1};
+        
         results.runspeed = dat.beh.runSpeed;
     end
     
