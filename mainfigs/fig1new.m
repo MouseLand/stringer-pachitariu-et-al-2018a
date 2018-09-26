@@ -13,10 +13,10 @@ default_figure([1 1 6.25 7]);
 
 %%
 %trange = 750+[1:1500];
-trange = [1:1200];
+trange = [1:600];
 
-pcplot=(my_conv2(zscore(pc.results.spks(1:2:end,trange),1,2),[5 1],[1 2]));
-clustplot=(my_conv2(zscore(clust.results.spks(end:-1:1,trange),1,2),[5 1],[1 2]));
+pcplot=(my_conv2(zscore(pc.results.spks(1:2:end,trange),1,2),[3 0.5],[1 2]));
+clustplot=(my_conv2(zscore(clust.results.spks(end:-1:1,trange),1,2),[3 0.5],[1 2]));
 %%
 clear hs;
 i = 0;
@@ -110,13 +110,14 @@ axis square;
 ylim([-.05 .25]);
 
 % ----------- correlation with behavior ----------%
-tstr = {'running','pupil area','whisking'};
+tstr = {'running','pupil area','whisking','all 3'};
 i = i+1;
 hs{i} = my_subplot(5,5,5,[xh yh]);
 %hs{i}.Position(2) = hs{i}.Position(2)+0.05;
 hold all; 
-cbeh = abs([pc.results.runcorr(:) pc.results.pupilcorr(:) pc.results.whiskcorr(:)]);
-for j = 1:3
+%cbeh = abs([pc.results.runcorr(:) pc.results.pupilcorr(:) pc.results.whiskcorr(:)]);
+cbeh=[squeeze(expvPC_behavior(1,1,:,1:3)) squeeze(expvPC_behavior(1,3,:,7))];
+for j = 1:4
     for d = 1:ndat
         plot(j+randn*.1,cbeh(d,j),'.','color',cdat(d,:),'markersize',6);
     end
@@ -126,10 +127,11 @@ end
 %plot(abs(results.runcorr),abs(results.pupilcorr),'o','color',cm(2,:),'markersize',4);
 axis square;
 %axis tight;
-axis([.5 3.5 0 1]);
-set(gca,'xtick',[1 2 3],'xticklabel',{'running','pupil area','whisking'});
+axis([.5 4.5 0 1]);
+set(gca,'xtick',[1:j],'xticklabel',tstr);
 xtickangle(45);
-ylabel('correlation with 1st PC');
+ylabel('variance explained');
+title('PC 1','fontweight','normal');
 
 % --------- PC img ------------------ %
 i = i+1;
@@ -159,20 +161,21 @@ axes('position',[pos(1) pos(2)-.11 pos(3) .1]);
 hold all;
 cm(1,:) = [.2 .8 .2];
 cm(2,:) = [.5 .6 .5];
-cm(3,:) = [0 .2 0];
+cm(3,:) = [.1 .9 .6];
 pcs = pc.results.firstpcs(trange(1:length(trange)/3),:);
-pcs = zscore(pcs,1,1);
+pcs = zscore(pcs.*sign(skewness(pcs)),1,1);
+pcs = pcs - min(pcs,[],1);
+behall = min(5,zscore(pc.results.behavior(trange(1:length(trange)/3),:)));
+behall(:,3) = behall(:,3)*-1;
+behall = behall - min(behall,[],1);
 tstr = {'running','pupil area','whisking'};
 for j = 1:3
-	beh = min(5,zscore(pc.results.behavior(trange(1:length(trange)/3),j)));
-	if j==3
-		beh=beh*-1;
-	end
+	beh = behall(:,j);
 	plot(beh,'linewidth',1,'color',cm(j,:),'linewidth',1);
 	text(.0,1.1-(j-1)*0.18,tstr{j},'fontangle','normal','fontsize',8,'color',cm(j,:));
 		%'fontweight','bold');
 end
-plot(pcs(:,1)*-1,'--','color',cpc(1,:),'linewidth',0.5);
+plot(pcs(:,1),'-.','color',cpc(1,:),'linewidth',0.5);
 text(.2,1,'PC 1','HorizontalAlignment','right','fontangle','normal','color',cpc(1,:),'fontsize',8)
 
 text(0,0,'  5 minutes','fontangle','normal','fontsize',8);
@@ -203,7 +206,7 @@ axis tight;
 
 % ----- PEER PRED PC TRACES ---------%
 i=i+1;
-hs{i}=my_subplot(5,3,13,[1 .9]);
+hs{i}=my_subplot(5,3,13,[.8 .9]);
 hs{i}.Position(1) = hs{i-1}.Position(1);
 
 v1 = exampleV1 - mean(exampleV1,2);
@@ -231,7 +234,7 @@ text(0,1,'PC #','fontangle','normal','HorizontalAlignment','right','fontsize',8)
 
 % ----- PEER PRED PC ---------%
 i=i+1;
-hs{i}=my_subplot(5,4,19,[xh*1.2 yh*1.2]);
+hs{i}=my_subplot(5,5,23,[xh*1.2 yh*1.2]);
 hs{i}.Position(1)=hs{i}.Position(1)-.03;
 for d = 1:ndat
     semilogx(expvPC(:,d),'color',cdat(d,:),'linewidth',0.5);
@@ -249,9 +252,33 @@ set(gca,'xtick',2.^[0:4:10],'ytick',[0:.2:1]);
 axis tight;
 ylim([0 1]);
 
+
+% ----- PC By PC VAR EXP ---------%
+i=i+1;
+hs{i}=my_subplot(5,5,24,[xh*1.2 yh*1.2]);
+hs{i}.Position(1)=hs{i}.Position(1)-.03;
+cm(4,:) = [0 0 0];
+idim = [1 1 1 3];
+ij = [1:3 7];
+for j=1:4
+    semilogx(mean(expvPC_behavior(1:end-1,idim(j),:,ij(j)),3),'color',cm(j,:),'linewidth',0.5);
+    hold all;
+end
+semilogx(mean(expvPC,2),'color',.6*[1 1 1],'linewidth',2);
+box off;
+axis square;
+xlabel('PC');
+ylabel({'explainable variance'});
+grid on;
+grid minor;
+grid minor;
+set(gca,'xtick',2.^[0:2:10],'ytick',[0:.2:1]);
+axis tight;
+axis([0 64 0 1]);
+
 % -------- PC VAR EXP BY BEH --------------- %
 i=i+1;
-hs{i} = my_subplot(5,4,20,[xh yh]);
+hs{i} = my_subplot(5,5,25,[xh yh]);
 %hs{i}.Position(3)=hs{i}.Position(3)+.03;
 ev=[squeeze(expvPC_behavior(end,1,:,1:3)) squeeze(expvPC_behavior(end,3,:,7))];
 for j = 1:ndat
