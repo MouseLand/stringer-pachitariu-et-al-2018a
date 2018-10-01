@@ -24,7 +24,7 @@ cgray = colormap('gray');
 
 
 % PC colors
-nPCs = 4;
+nPCs = 6;
 cpc = max(0,colormap('spring'));
 cpc = cpc(1:32,:);
 cpc = cpc(round(linspace(1,size(cpc,1),nPCs)),:);
@@ -139,18 +139,18 @@ x0 = .26;
 y0 = .76;
 xh0 = .7;
 yh0 = .24;
-hs{i} = my_subplot(4,1,2,[.9 .8]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.02;
-%hs{i}.Position(1)=hs{i}.Position(1)+.14;
+hs{i} = my_subplot(4,1,2,[.92 .8]);%axes('position',[x0 y0 xh0 yh0]);
+hs{i}.Position(2)=hs{i}.Position(2)+0.03;
+hs{i}.Position(1)=hs{i}.Position(1);
 %hs{i}.Position(1)=hs{i-4}.Position(1);
 pos=hs{i}.Position;
-[NN,NT] = size(pc.results.spks);
+[NN,NT] = size(pcplot);
 imagesc(pcplot(:,:), [0 .3]);
 hold all;
 colormap(hs{i},flipud(cgray));
-%plot([1 1]+10+size(pcplot,2), NN-1000+[0 1000],'k','linewidth',2);
-ht=text(1.03,-.0,'1000 neurons','fontangle','normal','fontsize',8,'HorizontalAlignment','right');
-ht.Rotation = 270;
+plot(-5*[1 1], [NN-500 NN],'k','linewidth',2);
+ht=text(-.03,-.0,'1000 neurons','fontangle','normal','fontsize',8,'HorizontalAlignment','left');
+ht.Rotation = 90;
 %ht=text(-0.03,.5,'sorted by 1st PC weights','fontangle','normal','fontsize',8,...
 %    'HorizontalAlignment','center','fontweight','bold');
 %ht.Rotation = 90;
@@ -177,10 +177,11 @@ for j = 1:3
 end
 plot(pcs(:,1),'-.','color',cpc(1,:),'linewidth',0.5);
 text(.2,1,'PC 1','HorizontalAlignment','right','fontangle','normal','color',cpc(1,:),'fontsize',8)
-
-text(0,0,'  5 minutes','fontangle','normal','fontsize',8);
+text(0,-.05,'  10 s','fontangle','normal','fontsize',8);
+plot([0 10/1.2],-.3*[1 1],'k','LineWidth',2);
 axis tight;
 axis off;
+xlim([-5/3 size(pcs,1)]);
 
 
 % ---------- CLUST img ------------- %
@@ -196,19 +197,16 @@ imagesc(clustplot(:,:), [0 .3]);
 hold all;
 colormap(hs{i},flipud(cgray));
 %plot([1 1]+10+size(clustplot,2), NN-1000+[0 1000],'k','linewidth',2);
-ht=text(1.03,-.0,'1000 neurons','fontangle','normal','fontsize',8,'HorizontalAlignment','right');
-ht.Rotation = 270;
-%ht=text(-0.03,.5,'sorted by 1st PC weights','fontangle','normal','fontsize',8,...
-%    'HorizontalAlignment','center','fontweight','bold');
-%ht.Rotation = 90;
+plot(-5*[1 1], [NN-500 NN],'k','linewidth',2);
+ht=text(-.03,-.0,'1000 neurons','fontangle','normal','fontsize',8,'HorizontalAlignment','left');
+ht.Rotation = 90;
 axis off;
 axis tight;
 
 % ----- PEER PRED PC TRACES ---------%
 i=i+1;
-hs{i}=my_subplot(5,3,13,[.8 .9]);
+hs{i}=my_subplot(5,5,21,[.75 .9]);
 hs{i}.Position(1) = hs{i-1}.Position(1);
-
 v1 = exampleV1 - mean(exampleV1,2);
 v2 = exampleV2 - mean(exampleV1,2);
 %v1 = v1 ./ std(exampleV1(1,:),1,2);
@@ -216,7 +214,7 @@ v2 = exampleV2 - mean(exampleV1,2);
 v1 = v1 ./ std(exampleV1(:,:),1,2);
 v2 = v2 ./ std(exampleV1(:,:),1,2);
 t=0;
-tr = [1:200];
+tr = [1:75];
 for n = [1 10 100 1000]
     t=t+1;
     plot(v1(n,tr)-(t-1)*5,'color',cpc(t,:));
@@ -224,18 +222,16 @@ for n = [1 10 100 1000]
     plot(v2(n,tr)-(t-1)*5,'color',.8*[1 1 1]);
     text(-0,.9-(t-1)*.22,sprintf('%d',n),'color',cpc(t,:),'fontangle','normal','HorizontalAlignment','right','fontsize',8);
 end
-text(1,1,'prediction','color',0.8*[1 1 1],'fontangle','normal','HorizontalAlignment','right','fontsize',8);
+text(.9,1.05,'prediction','color',0.8*[1 1 1],'fontangle','normal','HorizontalAlignment','right','fontsize',8);
 box off;
 axis off;
-text(0,1,'PC #','fontangle','normal','HorizontalAlignment','right','fontsize',8);
+text(0,1.05,'PC #','fontangle','normal','HorizontalAlignment','right','fontsize',8);
 %set(gca,'xtick',2.^[0:4:10],'ytick',[0:.10:.30]);
-
-
 
 % ----- PEER PRED PC ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,23,[xh*1.2 yh*1.2]);
-hs{i}.Position(1)=hs{i}.Position(1)-.03;
+hs{i}=my_subplot(5,5,22,[xh yh]);
+hs{i}.Position(1)=hs{i}.Position(1)+.04;
 for d = 1:ndat
     semilogx(expvPC(:,d),'color',cdat(d,:),'linewidth',0.5);
     hold all;
@@ -253,10 +249,53 @@ axis tight;
 ylim([0 1]);
 
 
+% ------ PEER PRED DIAGRAM ------ %
+i=i+1;
+hs{i}=my_subplot(5,5,23,[xh yh]);
+axis off;
+hold all;
+msize = 6;
+nls = [6 3 6];
+call{1} = cpc;
+call{2} = repmat([0 0 0],nls(2),1);
+call{3} = repmat([1 1 1]*.8,nls(3),1);
+ells = [3 3 3];
+hp=hs{i}.Position;
+hp(1)=hp(1)-.02;
+hp(3)=hp(3)+.03;
+hp(2)=hp(2)-.04;
+hp(4)=hp(4)+.02;
+layeredNet(hp, nls, call, msize,ells);
+text(0,1.23,'PCs','HorizontalAlignment','center','fontsize',8);
+text(.5,1.03,'rank','HorizontalAlignment','center','fontsize',8);
+text(1,1.23,{'prediction','',''},'HorizontalAlignment','center','fontsize',8);
+axis off;
+
+% ----- PEER PRED NEURONS ---------%
+i=i+1;
+hs{i}=my_subplot(5,5,24,[xh yh]);
+hs{i}.Position(1)=hs{i}.Position(1)+.03;
+for d = 1:ndat
+	semilogx(ndims1,expv128(:,d),'color',cdat(d,:),'linewidth',0.5);
+	hold all;
+end
+semilogx(ndims1, mean(expv128,2),'k','linewidth',2);
+grid on;
+grid minor;
+grid minor;
+set(gca,'xtick',2.^[0:2:12],'ytick',[0:.2:1]);
+axis tight;
+box off;
+axis square;
+ylim([0 1]);
+ylabel({'explainable variance'});
+xlabel({'regression rank'});
+title('PC 1-128');
+
 % ----- PC By PC VAR EXP ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,24,[xh*1.2 yh*1.2]);
-hs{i}.Position(1)=hs{i}.Position(1)-.03;
+hs{i}=my_subplot(5,5,25,[xh yh]);
+hs{i}.Position(1)=hs{i}.Position(1)+.01;
 cm(4,:) = [0 0 0];
 idim = [1 1 1 3];
 ij = [1:3 7];
@@ -275,26 +314,6 @@ grid minor;
 set(gca,'xtick',2.^[0:2:10],'ytick',[0:.2:1]);
 axis tight;
 axis([0 64 0 1]);
-
-% -------- PC VAR EXP BY BEH --------------- %
-i=i+1;
-hs{i} = my_subplot(5,5,25,[xh yh]);
-%hs{i}.Position(3)=hs{i}.Position(3)+.03;
-ev=[squeeze(expvPC_behavior(end,1,:,1:3)) squeeze(expvPC_behavior(end,3,:,7))];
-for j = 1:ndat
-    plot([1:4],ev(j,:),'color',cdat(j,:))
-    hold all;
-end
-plot([1:4],mean(ev),'ko-','linewidth',2,'markerfacecolor','k','markersize',4)
-box off;
-set(gca,'xtick',[1:8],'xticklabel',{'running','pupil area','whisking','all 3'});
-xtickangle(45);
-axis square;
-axis tight;
-ylabel({'variance explained','(test set)'});
-xlim([0.5 4.5]);
-ylim([0 0.13]);
-title('PC 1-128','fontweight','normal');
 
 % %
 % for j = [1 2 3]

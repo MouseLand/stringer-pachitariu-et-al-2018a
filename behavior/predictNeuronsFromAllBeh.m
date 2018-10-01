@@ -3,7 +3,7 @@ function results = predictNeuronsFromAllBeh(dataroot, matroot, useGPU, dex)
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
 ndims0 = [1 2 3 4 8 16 32 64 128];
-npc = 128;
+npc = 64;
 
 clf;
 expv_behavior = NaN*ones(length(ndims0),length(dall.db),10);

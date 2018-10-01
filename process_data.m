@@ -1,12 +1,12 @@
 clear all
 
 % you should change this to your local data paths
-%dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
-dataroot = 'D:/grive/10krecordings/spont_paper';
+dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
+%dataroot = 'D:/grive/10krecordings/spont_paper';
 
 % give a local folder for saving intermediate data (3GB max)
-%matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
-matroot = 'D:/grive/10krecordings/spontResults';
+matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
+%matroot = 'D:/grive/10krecordings/spontResults';
 
 mkdir(matroot)
 
@@ -18,8 +18,8 @@ addpath(genpath('.'));
 
 % also download rastermap
 % https://github.com/MouseLand/rastermap/
-%addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
-addpath('C:\Users\carse\github\rastermap\matlab');
+addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
+%addpath('C:\Users\carse\github\rastermap\matlab');
 
 dex = 2; % second dataset as example dataset
 

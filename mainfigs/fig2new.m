@@ -116,8 +116,9 @@ annotation('arrow',[x0 x1],[y0 y0]);
 
 % ---------- SCHEMATIC ------------------%
 i=i+1;
-hs{i} = my_subplot(5,3,4,[.8 .6]);
+hs{i} = my_subplot(5,3,4,[1 .6]);
 hs{i}.Position(2)=hs{i}.Position(2)+.02;
+hs{i}.Position(1) = hs{i}.Position(1) + .04;
 hold all;
 trange = 200+[1:100];
 NT = length(trange);
@@ -132,9 +133,9 @@ axis tight;
 axis off;
 text(0,1.2,'motion energy PCs','fontsize',8);
 text(1.95,1.2,'neural PCs','fontsize',8);
-
-h2=my_subplot(5,3,6,[.8 .6]);
-h2.Position(1) = h2.Position(1) - .14;
+text(1.35,1,'rank','fontsize',8);
+h2=my_subplot(5,3,6,[1 .6]);
+h2.Position(1) = h2.Position(1) -.03;
 h2.Position(2) = h2.Position(2) + .02;
 hold all;
 cp = .4*[1 1 1];
@@ -181,8 +182,8 @@ axis off;
 
 % --------------------- DIMS VS VAR EXP -------------- %
 i=i+1;
-hs{i} = my_subplot(5,4,9,[.7 .7]);
-hs{i}.Position(1) = hs{i}.Position(1) + .04;
+hs{i} = my_subplot(5,4,9,[.65 .65]);
+hs{i}.Position(1) = hs{i}.Position(1) + .06;
 hs{i}.Position(2) = hs{i}.Position(2)+.01;
 %hs{i}.Position(2) = hs{i-1}.Position(2);
 for j = 1:ndat
@@ -198,6 +199,8 @@ ylim([0 .28]);
 xlim([0 128]);
 hold all;
 semilogx(ndims0,mean(squeeze(expvPC_behavior(end,:,:,9)),2),'k','linewidth',2);
+semilogx(ndims0,mean(squeeze(expvPC_behavior(end,3,:,7)))*ones(length(ndims0),1),'k-.','linewidth',1);
+text(1.2,.35,'run+pupil+whisk','HorizontalAlignment','right','fontangle','normal','fontsize',8);
 axis square;
 grid on;
 grid minor;
@@ -206,84 +209,116 @@ title('PC 1-128','fontweight','normal');
 
 % ------------ PC VAR EXP ------------%
 i=i+1;
-hs{i} = my_subplot(5,4,13,[.7 .7]);
-hs{i}.Position(1) = hs{i}.Position(1) + .04;
+hs{i} = my_subplot(5,4,13,[.65 .65]);
+hs{i}.Position(1) = hs{i}.Position(1) + .06;
 hs{i}.Position(2) = hs{i}.Position(2)+.01;
 for j = 1:ndat
 	semilogx([1:128],expvPC_behavior(1:end-1,6,j,9),'color',cdat(j,:))
 	hold all;
 end
 semilogx([1:128],mean(expvPC_behavior(1:end-1,6,:,9),3),'k','linewidth',2);
-semilogx([1:128],mean(expvPC(1:128,:),2),'color',.8*[1 1 1],'linewidth',2);
+%semilogx([1:128],mean(expvPC(1:128,:),2),'color',.6*[1 1 1],'linewidth',2);
+%semilogx([1:128],mean(squeeze(expvPC_behavior(1:end-1,3,:,7)),2),'k-.','linewidth',1);
 %axis([0 .06 0 .06]);
 set(gca,'xtick',10.^[0 1 2])
 ylabel({'variance explained','(test set)'});
-text(.6,.9,'peer PC','color',.8*[1 1 1])
+%text(.6,1,{'max','explainable'},'color',.6*[1 1 1],'fontsize',8)
 xlabel('PC dimension');
 box off;
 axis square;
 axis tight;
 ylim([-.1 1]);
+xlim([0 128]);
+grid on;
+grid minor;
+grid minor;
+
+% ------------ PC VAR EXP ------------%
+i=i+1;
+hs{i} = my_subplot(5,4,17,[.65 .65]);
+hs{i}.Position(1) = hs{i}.Position(1) + .06;
+hs{i}.Position(2) = hs{i}.Position(2)+.01;
+
+semilogx([1:128],mean(expvPC_behavior(1:end-1,6,:,9),3),'k','linewidth',2);
+hold all;
+semilogx([1:128],mean(expvPC(1:128,:),2),'color',.6*[1 1 1],'linewidth',2);
+semilogx([1:128],mean(squeeze(expvPC_behavior(1:end-1,3,:,7)),2),'k-.','linewidth',1);
+%axis([0 .06 0 .06]);
+set(gca,'xtick',10.^[0 1 2])
+ylabel({'variance explained','(test set)'});
+text(.4,1.1,{'max','explainable'},'color',.6*[1 1 1],'fontsize',8)
+text(1.2,0.13,'run+pupil+whisk','HorizontalAlignment','right','fontangle','normal','fontsize',8);
+text(.4,0.6,'face','fontangle','normal','fontsize',8);
+xlabel('PC dimension');
+box off;
+axis square;
+axis tight;
+ylim([-.15 1]);
+xlim([0 128]);
 grid on;
 grid minor;
 grid minor;
 
 
 
+
 % ------------ RASTERS
-trange = [trange(5:end-13) 830+[1:70] 1200+[1:50]];
+trange = [trange(5:end-13) 830+[1:45]];% 1200+[1:50]];
 i=i+1;
-hs{i}=my_subplot(5,2,6,[.8 .8]);
-hs{i}.Position(1) = .34;
-hs{i}.Position(3) = .63;
+hs{i}=my_subplot(5,2,6,[.7 .8]);
+hs{i}.Position(1) = .37;
+hs{i}.Position(3) = .6;
 %hs{i}.Position(2) = hs{i-2}.Position(2)-.02;
 %hs{i}.Position(1) = hs{4}.Position(1);
 %hs{i}.Position(2) = hs{i}.Position(2) + .025;
 %hs{i}.Position(4) = .22;
 yt = ytest{dex}(isortembed{dex},trange);
+yt = circshift(yt,600,1);
 ytstd = max(1e-3,std(yt,1,2));
 yt = yt ./ ytstd;
-imagesc(my_conv2(yt, 6, 1),[0 .5])
+imagesc(my_conv2(yt, 3, 1),[0 .4])
 colormap(hs{i},flipud(cgray));
 axis off;
 text(0,1.15,'Neural activity (test set) sorted by 1D embedding','fontangle','normal','fontsize',8);
 NN=size(yt,1);
 hold all;
-plot([0 30/1.2], (NN+100)*[1 1],'k');
+plot([0 10/1.2], (NN+100)*[1 1],'k');
 plot([0 0]-0, NN+[0 -1000],'k');
 ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
 ht.Rotation=90;
-text(0,0,'    30 s','fontsize',8,'fontangle','normal');
+text(0,0,'10 s','fontsize',8,'fontangle','normal');
 axis tight;
 
 hp=my_subplot(5,2,8,[.8 .8]);
-hp.Position(1) = .34;
-hp.Position(3) = .63;
+hp.Position(1) = hs{i}.Position(1);
+hp.Position(3) = hs{i}.Position(3);
 %hp.Position(1) = hs{4}.Position(1);
 %hp.Position(2) = hp.Position(2) - .00;
 %hp.Position(4) = .22;
 yp = ypred{dex}(isortembed{dex},trange);
-yp = my_conv2(yp, 1, 1);
+yp = circshift(yp,600,1);
+%yp = my_conv2(yp, 0.5, 1);
 yp = yp ./ ytstd; % scale prediction by same amount
-imagesc(yp,[0 .5])
+imagesc(yp,[0 .4])
 colormap(hp,flipud(cgray));
 axis off;
 text(0,1.15,'Neural activity prediction (test set) from faces','fontangle','normal','fontsize',8);
 ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
 ht.Rotation=90;
 hold all;
-plot([0 30/1.2], (NN+100)*[1 1],'k');
+plot([0 10/1.2], (NN+100)*[1 1],'k');
 plot([0 0]-0, NN+[0 -1000],'k');
-text(0,0,'    30 s','fontsize',8,'fontangle','normal');
+text(0,0,'10 s','fontsize',8,'fontangle','normal');
 axis tight;
 
 
 
-xh=.6;
-yh=.6;
+xh=.55;
+yh=.55;
 %-------------- PEER PRED -----------------%
 i=i+1;
-hs{i}=my_subplot(5,4,17,[xh yh]);
+hs{i}=my_subplot(5,4,18,[xh yh]);
+hs{i}.Position(1) = hs{i}.Position(1)+.05;
 expvPCcum = cumsum(expvPCCov)./cumsum(expvPCVar);
 ev = [expvPCcum(128,:)' squeeze(expvPC_behavior(end,6,:,9))];
 hold all;
@@ -298,28 +333,9 @@ ylabel('weights');
 ylim([0 .80])
 xlim([0 .8]);
 ylabel({'face'});
-xlabel({'peer prediction'});
+xlabel({'max explainable'});
 %ht=title({'% variance explained',''},'fontsize',8);
 %ht.Position(2) = ht.Position(2)-4;
-grid on;
-grid minor;
-grid minor;
-title('PC 1-128','fontweight','normal');
-
-% ------------ FACE (16D) vs arousal ------------%
-i=i+1;
-hs{i} = my_subplot(5,4,18,[xh yh]);
-hold all;
-plot([0 15],[0 15],'k');
-for j = 1:ndat
-    plot(expvPC_behavior(end,3,j,7), expvPC_behavior(end,6,j,9),'wo',...
-        'markerfacecolor',cdat(j,:),'markersize',5);
-end
-axis([0 .3 0 .3]);
-ylabel('face');
-xlabel('run+pupil+whisk (3D)');
-box off;
-axis square;
 grid on;
 grid minor;
 grid minor;
@@ -328,6 +344,7 @@ title('PC 1-128','fontweight','normal');
 % ------------ FACE (16D) + arousal ------------%
 i=i+1;
 hs{i} = my_subplot(5,4,19,[xh yh]);
+hs{i}.Position(1) = hs{i}.Position(1)+.03;
 hold all;
 plot([0 15],[0 15],'k');
 for j = 1:ndat
