@@ -65,32 +65,26 @@ for d = [1:length(dall.db)]
         Ff = gpuArray(single(Ff));
     end
     
-    [utrain,~,vtrain1] = svdecon(Ff(ntrain,itrain));
-    [utest,~,vtest1] = svdecon(Ff(ntest,itrain));
     npc = 1024;%min(size(vtrain,2));
-    vtrain1 = vtrain1(:,1:npc);
-    vtest1 = vtest1(:,1:npc);
-    utrain = utrain(:,1:npc);
-    utest = utest(:,1:npc);
-	vtrain2 = Ff(ntrain,itest)' * utrain;
-    vtest2 = Ff(ntest,itest)' * utest;
-    %%
-	%cov = vtrain1' * vtest1;
-	%[u,s,v] = svdecon(cov);
-	%sout = u' * vtrain2' * vtest2 * v;
+    
 	cov = Ff(ntrain,itrain) * Ff(ntest,itrain)';
 	[u,s,v] = svdecon(cov);
-	s1 = u' * Ff(ntrain,itest);
-	s2 = v' * Ff(ntest,itest);
+	s1 = u(:,1:npc)' * Ff(ntrain,itest);
+	s2 = v(:,1:npc)' * Ff(ntest,itest);
 	sneur = sum(s1 .* s2, 2);
 	varneur = sum(s1.^2 + s2.^2,2)/2;
 	semilogx(sneur./varneur)
 		
-	cov_neur(:,d) = sneur(1:1024);
-	var_all_neur(:,d) = varneur(1:1024);
+	cov_neur(:,d) = gather_try(sneur);
+	var_neur(:,d) = gather_try(varneur);
 	drawnow;
+	
+	if d == dex
+		exampleV1 = gather_try(s1);
+		exampleV2 = gather_try(s2);
+	end
 end
 
 %%
 
-save(fullfile(matroot,'PCpredict.mat'),'expvPC','expvPCCov','expvPCVar','expv128','ndims1','exampleV1','exampleV2');
+save(fullfile(matroot,'PCpredict.mat'),'cov_neur','var_neur','exampleV1','exampleV2');

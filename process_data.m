@@ -1,7 +1,7 @@
 clear all
 
 % you should change this to your local data paths
-dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper';
+dataroot = '/media/carsen/DATA2/grive/10krecordings/spontData';
 %dataroot = 'D:/grive/10krecordings/spont_paper';
 
 % give a local folder for saving intermediate data (3GB max)

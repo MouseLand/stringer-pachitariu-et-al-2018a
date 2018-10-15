@@ -44,7 +44,7 @@ for d = 1:length(dbs)
     
     y    = bin2d(y, tbin, 2);
         
-    % subtract mean and divide by std before binning
+    % subtract spont mean and divide by std before binning
     ysub = mean(y,2);
     ystd = 1e-6 + std(y,1,2);
     y    = (y - ysub)./ystd;
@@ -75,12 +75,12 @@ for d = 1:length(dbs)
     uSpont = u(:,1:32);
     
     %% compute stimulus vectors
-    istim = dat.stim.istim;
-    sresp = dat.stim.resp(:, gcell);
+    istim = dat.stim.istim(dat.stim.istim<33);
+    sresp = dat.stim.resp(dat.stim.istim<33, gcell);
     
     yall = dat.Fsp(gcell,:);
     
-    % subtract mean and std from spont
+    % subtract mean and std from spont periods
     sresp = (sresp - ysub')./ystd';
     yall  = (yall  - ysub) ./ystd;
     
@@ -89,7 +89,7 @@ for d = 1:length(dbs)
     A = compute_means(istim, sresp, 3, 1);
     
     % stimulus vectors
-    sm = mean(A(1:end-1,:,[2 3]),3); % mean on train blocks
+    sm = mean(A(1:end,:,[2 3]),3); % mean on train blocks
     
     % stimulus projection
     sproj = normc(sm')' * yall;
@@ -106,7 +106,7 @@ for d = 1:length(dbs)
     ybin = bin2d(yall(:,~tnoface),tbin,2);
     
     for ktype = 1:2
-        ist = sum(sum(isnan(A(1:end-1,:,:)),3),2)==0;
+        ist = sum(sum(isnan(A(1:end,:,:)),3),2)==0;
         Astim = A(ist,:,:);
         
         % total stimulus variance
@@ -161,8 +161,9 @@ for d = 1:length(dbs)
     ytest=[];
     istims=[];
     yf = zeros(32,NN);
+	istimout = istim;
     for isti = 1:32
-        isa = find(dat.stim.istim==isti);
+        isa = find(istim==isti);
         iss = randperm(numel(isa));
         iss = isa(iss);
         ni = numel(iss);
@@ -170,21 +171,26 @@ for d = 1:length(dbs)
         ytest = cat(1,ytest,sresp(iss(floor(ni/3)+[1:floor(ni/3)]),:));
         yf(isti,:) = mean(sresp(iss(floor(2*ni/3)+[1:floor(ni/3)]),:),1);
         istims = cat(1,istims,isti*ones(floor(ni/3),1));
+		istimout(iss(floor(2*ni/3)+[1:floor(ni/3)])) = NaN;
     end
     usub{3} = normc(yf');
     Ssub{3} = usub{3} - ushared * (ushared'*usub{3});
-    [u,s,v] = svdecon(Ssub{3}-mean(Ssub{3},2));
-    Ssub{3} = u;
+	Ssub{3} = normc(Ssub{3});
+    [u,s,v] = svdecon(double(Ssub{3}));
+    %Ssub{3} = normc(u);
     %[u,s,v] = svdecon(usub{3}-mean(usub{3},2));
     %usub{3} = u;
-    
+    vrot = eye(size(v));
+	%vrot = v;
+	
     clf;
     for k = 1:3
         ystim = zeros(size(ytest,1),size(Ssub{k},2),2);
-		ystim(:,:,1) = ytrain * Ssub{k};
-        ystim(:,:,2) = ytest * Ssub{k};
-        yspont = y' * Ssub{k};
-		vsignal = mean(ystim(:,:,1).*ystim(:,:,2));
+		ystim(:,:,1) = ytrain * Ssub{k} * vrot;
+        ystim(:,:,2) = ytest * Ssub{k}  * vrot;
+        yspont = y' * Ssub{k} * vrot;
+		vsignal = mean((ystim(:,:,1)-mean(ystim(:,:,1),1)).*(ystim(:,:,2)-mean(ystim(:,:,2),1)));
+		%vsignal = mean(ystim(:,:,1).*ystim(:,:,2),1);
 		vstim      =  0.5 * (var(ystim(:,:,1), 1, 1) + var(ystim(:,:,2), 1, 1));
 		vspont     = var(yspont, 1, 1);
         
@@ -196,8 +202,30 @@ for d = 1:length(dbs)
         axis tight;
         drawnow;
         results.vsigstimspont(:,:,k,d) = [vsignal' vstim' vspont'];
-    end
+	end
         
+	% projections onto stims (without subtraction)
+    results.istims{d} = istimout(~isnan(istimout));
+    for k = 1:3
+        results.projstim{d}{k} =  sresp(~isnan(istimout),:) * Ssub{k};
+    end
+    %results.projstim{d}{3} =  sresp(~isnan(istimout),:) * (usub{3} - results.Ushared{d,1} * (results.Ushared{d,1}'*usub{3}));
+    results.projstim{d}{4} = sresp(~isnan(istimout),:) * results.Ushared{d,1};
+        
+	%% fit affine model to subspaces
+	for k=1:3
+		for additive = 0:1
+			if additive == 0
+				[results.fitmult(additive+1,k,d),results.multgain{d}] = fitAffine(results.projstim{d}{k}, results.istims{d}, additive);
+			else
+				results.fitmult(additive+1,k,d) = fitAffine(results.projstim{d}{k}, results.istims{d}, additive);
+				if k==3
+					disp(results.fitmult(:,k,d));
+				end
+			end
+		end
+	end
+	
     %% example dataset
     if d == 1
         results.sstim = normc(yf');
@@ -216,14 +244,7 @@ for d = 1:length(dbs)
             results.tprojS{ktype} = spontsub' * yall;
             results.tshared{ktype} = ushared' * yall;
                         
-        end
-        % projections onto stims (without subtraction)
-        results.istims = [istims; istims];
-        for k = 1:2
-            results.projstim{k} =  [ytrain; ytest] * Ssub{k};
-        end
-        results.projstim{3} =  [ytrain; ytest] * (usub{3} - results.Ushared{d,1} * (results.Ushared{d,1}'*usub{3}));
-        results.projstim{4} = [ytrain; ytest] * results.Ushared{d,1};
+		end
         
         results.runspeed = dat.beh.runSpeed;
     end
@@ -234,18 +255,4 @@ end
 %%
 
 save(fullfile(matroot,'stimvar.mat'),'-struct','results');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -9,7 +9,7 @@ expvPC_behavior = dbeh.expvPC_behavior;
 load(fullfile(matroot,'PCpredict.mat'));
 
 %%
-default_figure([1 1 6.25 7]);
+default_figure([1 1 6.25 7.5]);
 
 %%
 %trange = 750+[1:1500];
@@ -24,9 +24,9 @@ cgray = colormap('gray');
 
 
 % PC colors
-nPCs = 6;
+nPCs = 20;
 cpc = max(0,colormap('spring'));
-cpc = cpc(1:32,:);
+cpc = cpc(1:48,:);
 cpc = cpc(round(linspace(1,size(cpc,1),nPCs)),:);
 
 clf;
@@ -109,29 +109,25 @@ box off;
 axis square;
 ylim([-.05 .25]);
 
+pcs = pc.results.firstpcs(trange(1:length(trange)/3),:);
+pcs = zscore(pcs.*sign(skewness(pcs)),1,1);
+pcs = pcs - min(pcs,[],1);
+behall = min(5,zscore(pc.results.behavior(trange(1:length(trange)/3),:)));
+behall(:,3) = behall(:,3)*-1;
+behall = behall - min(behall,[],1);
+
 % ----------- correlation with behavior ----------%
 tstr = {'running','pupil area','whisking','all 3'};
 i = i+1;
 hs{i} = my_subplot(5,5,5,[xh yh]);
 %hs{i}.Position(2) = hs{i}.Position(2)+0.05;
 hold all; 
-%cbeh = abs([pc.results.runcorr(:) pc.results.pupilcorr(:) pc.results.whiskcorr(:)]);
-cbeh=[squeeze(expvPC_behavior(1,1,:,1:3)) squeeze(expvPC_behavior(1,3,:,7))];
-for j = 1:4
-    for d = 1:ndat
-        plot(j+randn*.1,cbeh(d,j),'.','color',cdat(d,:),'markersize',6);
-    end
-    errorbar(j,mean(cbeh(:,j)),std(cbeh(:,j))/sqrt(ndat-1),'k.','linewidth',1,'markersize',8);
-    
-end
-%plot(abs(results.runcorr),abs(results.pupilcorr),'o','color',cm(2,:),'markersize',4);
+plot(pcs(:,1),behall(:,1),'.','color',cpc(j,:));
+xlabel('PC magnitude');
+ylabel({'running','speed (a.u.)'});
 axis square;
-%axis tight;
-axis([.5 4.5 0 1]);
-set(gca,'xtick',[1:j],'xticklabel',tstr);
-xtickangle(45);
-ylabel('variance explained');
-title('PC 1','fontweight','normal');
+axis tight;
+title({'PC 1','r=0.75'},'fontweight','normal');
 
 % --------- PC img ------------------ %
 i = i+1;
@@ -139,8 +135,8 @@ x0 = .26;
 y0 = .76;
 xh0 = .7;
 yh0 = .24;
-hs{i} = my_subplot(4,1,2,[.92 .8]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.03;
+hs{i} = my_subplot(5,1,2,[.92 .8]);%axes('position',[x0 y0 xh0 yh0]);
+hs{i}.Position(2)=hs{i}.Position(2)-0.1;
 hs{i}.Position(1)=hs{i}.Position(1);
 %hs{i}.Position(1)=hs{i-4}.Position(1);
 pos=hs{i}.Position;
@@ -157,17 +153,11 @@ ht.Rotation = 90;
 axis off;
 axis tight;
 
-axes('position',[pos(1) pos(2)-.11 pos(3) .1]);
+axes('position',[pos(1) pos(2)+pos(4)+.02 pos(3) .08]);
 hold all;
 cm(1,:) = [.2 .8 .2];
 cm(2,:) = [.5 .6 .5];
 cm(3,:) = [.1 .9 .6];
-pcs = pc.results.firstpcs(trange(1:length(trange)/3),:);
-pcs = zscore(pcs.*sign(skewness(pcs)),1,1);
-pcs = pcs - min(pcs,[],1);
-behall = min(5,zscore(pc.results.behavior(trange(1:length(trange)/3),:)));
-behall(:,3) = behall(:,3)*-1;
-behall = behall - min(behall,[],1);
 tstr = {'running','pupil area','whisking'};
 for j = 1:3
 	beh = behall(:,j);
@@ -183,11 +173,10 @@ axis tight;
 axis off;
 xlim([-5/3 size(pcs,1)]);
 
-
 % ---------- CLUST img ------------- %
 i=i+1;
-hs{i} = my_subplot(4,1,3,[1 0.9]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)-.04;
+hs{i} = my_subplot(5,1,3,[1 0.9]);%axes('position',[x0 y0 xh0 yh0]);
+hs{i}.Position(2)=hs{i}.Position(2)-.06;
 hs{i}.Position(1) = hs{i-1}.Position(1);
 hs{i}.Position(4) = hs{i-1}.Position(4);
 hs{i}.Position(3) = hs{i-1}.Position(3);
@@ -203,118 +192,192 @@ ht.Rotation = 90;
 axis off;
 axis tight;
 
+% covariance computation schematic
+i=i+1;
+hs{i}=my_subplot(5,3,10,[.83 .83]);
+hs{i}.Position(1) = hs{i}.Position(1)-.03;
+hs{i}.Position(2) = hs{i}.Position(2)-.05;
+im = imread('cov_schematic2.png');
+image(im);
+axis off;
+axis image;
+
 % ----- PEER PRED PC TRACES ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,21,[.75 .9]);
-hs{i}.Position(1) = hs{i-1}.Position(1);
-v1 = exampleV1 - mean(exampleV1,2);
+hs{i}=my_subplot(5,3,11,[.75 .75]);
+hs{i}.Position(1) = hs{i}.Position(1)-.05;
+hs{i}.Position(2) = hs{i}.Position(2)-.06;
 v2 = exampleV2 - mean(exampleV1,2);
-%v1 = v1 ./ std(exampleV1(1,:),1,2);
-%v2 = v2 ./ std(exampleV1(1,:),1,2);
-v1 = v1 ./ std(exampleV1(:,:),1,2);
+v1 = exampleV1 - mean(exampleV1,2);
 v2 = v2 ./ std(exampleV1(:,:),1,2);
+v1 = v1 ./ std(exampleV1(:,:),1,2);
+sk = skewness(v1,1,2);
+v1 = v1 .* sign(sk);
+v2 = v2 .* sign(sk);
 t=0;
-tr = [1:75];
+tr = 0+[1:75];
 for n = [1 10 100 1000]
     t=t+1;
-    plot(v1(n,tr)-(t-1)*5,'color',cpc(t,:));
+    plot(v1(n,tr)-(t-1)*6,'color',cpc(4*(t-1)+1,:));
     hold all;
-    plot(v2(n,tr)-(t-1)*5,'color',.8*[1 1 1]);
-    text(-0,.9-(t-1)*.22,sprintf('%d',n),'color',cpc(t,:),'fontangle','normal','HorizontalAlignment','right','fontsize',8);
+    plot(v2(n,tr)-(t-1)*6,'color',.8*[1 1 1]);
+    text(-0,.9-(t-1)*.22,sprintf('%d',n),'color',cpc(4*(t-1)+1,:),'fontangle','normal','HorizontalAlignment','right','fontsize',8);
 end
-text(.9,1.05,'prediction','color',0.8*[1 1 1],'fontangle','normal','HorizontalAlignment','right','fontsize',8);
+text(.9,1.05,'test','color',0.8*[1 1 1],'fontangle','normal','HorizontalAlignment','right','fontsize',8);
+text(.3,1.05,'train','color',cpc(1,:),'fontangle','normal','HorizontalAlignment','right','fontsize',8);
 box off;
 axis off;
 text(0,1.05,'PC #','fontangle','normal','HorizontalAlignment','right','fontsize',8);
 %set(gca,'xtick',2.^[0:4:10],'ytick',[0:.10:.30]);
 
 % ----- PEER PRED PC ---------%
-i=i+1;
-hs{i}=my_subplot(5,5,22,[xh yh]);
-hs{i}.Position(1)=hs{i}.Position(1)+.04;
-for d = 1:ndat
-    semilogx(expvPC(:,d),'color',cdat(d,:),'linewidth',0.5);
-    hold all;
+t=0;
+for n = [1 10 100 1000]
+	i=i+1;
+	t=t+1;
+	hs{i}=my_subplot(5,8,28+t,[xh*.9 yh*.9]);
+	hs{i}.Position(2)=hs{i}.Position(2)-.07;
+	if t==1
+		hs{i}.Position(1)=hs{i}.Position(1)+.1;
+	else
+		hs{i}.Position(1)=hs{i}.Position(1)+.03*(4-t);
+	end
+	plot(exampleV1(n,:)*-1,exampleV2(n,:)*-1,'.','color',cpc(4*(t-1)+1,:),'markersize',2);
+	box off;
+	axis square;
+	axis tight;
+	if t==1
+		xlabel('train');
+		ylabel({'test'});
+	end
+	title(sprintf('PC %d \n r=%1.2f',n,corr(exampleV1(n,:)',exampleV2(n,:)')),'FontWeight','normal')
+	if n==1
+		set(gca,'xtick',[0 2000],'ytick',[0 2000]);
+	else
+		set(gca,'xtick',[0 2000],'ytick',[0 2000],'xticklabel',{},'yticklabel',{});
+	end
+	axis([-1000 2000 -1000 2000]);
 end
-semilogx(mean(expvPC,2),'k','linewidth',2);
-box off;
-axis square;
-xlabel('PC');
-ylabel({'explainable variance'});
-grid on;
-grid minor;
-grid minor;
-set(gca,'xtick',2.^[0:4:10],'ytick',[0:.2:1]);
-axis tight;
-ylim([0 1]);
 
-
-% ------ PEER PRED DIAGRAM ------ %
+% ----- power-law ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,23,[xh yh]);
-axis off;
-hold all;
-msize = 6;
-nls = [6 3 6];
-call{1} = cpc;
-call{2} = repmat([0 0 0],nls(2),1);
-call{3} = repmat([1 1 1]*.8,nls(3),1);
-ells = [3 3 3];
-hp=hs{i}.Position;
-hp(1)=hp(1)-.02;
-hp(3)=hp(3)+.03;
-hp(2)=hp(2)-.04;
-hp(4)=hp(4)+.02;
-layeredNet(hp, nls, call, msize,ells);
-text(0,1.23,'PCs','HorizontalAlignment','center','fontsize',8);
-text(.5,1.03,'rank','HorizontalAlignment','center','fontsize',8);
-text(1,1.23,{'prediction','',''},'HorizontalAlignment','center','fontsize',8);
-axis off;
-
-% ----- PEER PRED NEURONS ---------%
-i=i+1;
-hs{i}=my_subplot(5,5,24,[xh yh]);
-hs{i}.Position(1)=hs{i}.Position(1)+.03;
+hs{i}=my_subplot(5,5,21,[xh yh]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
+hs{i}.Position(1)=hs{i}.Position(1)+.025;
 for d = 1:ndat
-	semilogx(ndims1,expv128(:,d),'color',cdat(d,:),'linewidth',0.5);
+	loglog(cov_neur(:,d)/sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5)
 	hold all;
 end
-semilogx(ndims1, mean(expv128,2),'k','linewidth',2);
+loglog(nanmean(cov_neur,2)/sum(nanmean(cov_neur,2)),'k','linewidth',1)
+box off;
+axis square;
+xlabel('PC dimension');
+ylabel({'reliable','variance'});
+set(gca,'xtick',10.^[0:3],'ytick',10.^[-4:2:10]);
+axis tight;
+ylim([1e-5 1]);
+text(0.25,0.95,'\alpha = 1.14','fontsize',8)
 grid on;
 grid minor;
 grid minor;
-set(gca,'xtick',2.^[0:2:12],'ytick',[0:.2:1]);
-axis tight;
+
+% ----- PEER PRED PC ---------%
+i=i+1;
+hs{i}=my_subplot(5,5,22,[xh yh]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
+hs{i}.Position(1)=hs{i}.Position(1)+.02;
+for d = 1:ndat
+    semilogx(cumsum(cov_neur(:,d))./sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5);
+    hold all;
+end
+semilogx(mean(cumsum(cov_neur)./sum(cov_neur),2),'k','linewidth',2);
 box off;
 axis square;
+xlabel('PC dimension');
+ylabel({'reliable','variance'});
+title({'cumulative'},'fontweight','normal')
+set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
+axis tight;
 ylim([0 1]);
-ylabel({'explainable variance'});
-xlabel({'regression rank'});
-title('PC 1-128');
+
+% ----- PEER PRED PC ---------%
+i=i+1;
+hs{i}=my_subplot(5,5,23,[xh yh]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
+hs{i}.Position(1)=hs{i}.Position(1)+.01;
+for d = 1:ndat
+    semilogx(cov_neur(:,d)./var_neur(:,d),'color',cdat(d,:),'linewidth',0.5);
+    hold all;
+end
+semilogx(mean(cov_neur./var_neur,2),'color',.8*[1 1 1],'linewidth',2);
+%expccum = cumsum(nanmean(cov_neur,2))./cumsum(nanmean(var_neur,2));
+%semilogx(expccum,'k','LineWidth',2);
+%text(0.2,1.15,'cumulative','FontSize',8);
+text(0.05,0.25,'mean','FontSize',8,'color',.6*[1 1 1]);
+box off;
+axis square;
+xlabel('PC dimension');
+ylabel({'variance','explained'});
+%title({'explainable','variance'},'fontweight','normal')
+set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
+axis tight;
+ylim([0 1]);
+
+
 
 % ----- PC By PC VAR EXP ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,25,[xh yh]);
+hs{i}=my_subplot(5,5,24,[xh yh]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
 hs{i}.Position(1)=hs{i}.Position(1)+.01;
 cm(4,:) = [0 0 0];
 idim = [1 1 1 3];
 ij = [1:3 7];
 for j=1:4
-    semilogx(mean(expvPC_behavior(1:end-1,idim(j),:,ij(j)),3),'color',cm(j,:),'linewidth',0.5);
+    semilogx((nanmean(cov_neur,2) - nanmean(cov_res_beh(:,idim(j),:,ij(j)),3))./nanmean(var_neur,2),'color',cm(j,:),'linewidth',0.5);
     hold all;
 end
-semilogx(mean(expvPC,2),'color',.6*[1 1 1],'linewidth',2);
+semilogx(mean(cov_neur./var_neur,2),'color',.8*[1 1 1],'linewidth',2);
 box off;
 axis square;
-xlabel('PC');
-ylabel({'explainable variance'});
+xlabel('PC dimension');
+ylabel({'variance','explained'});
+set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
+axis tight;
+axis([0 1024 0 1]);
+
+
+% ----- PC By PC VAR EXP ---------%
+i=i+1;
+hs{i}=my_subplot(5,5,25,[xh yh]);
+hs{i}.Position(2)=hs{i}.Position(2)-.02;
+hs{i}.Position(1)=hs{i}.Position(1)+.01;
+cm(4,:) = [0 0 0];
+idim = [1 1 1 3];
+ij = [1:3 7];
+exbeh = [];
+for j=1:4
+    exb = cumsum(cov_neur - squeeze(cov_res_beh(:,idim(j),:,ij(j))))./cumsum(var_neur);
+	exbeh(j,:) = exb(128,:);
+end
+for d= 1:ndat
+	plot(exbeh(:,d),'color',cdat(d,:));
+	hold all;
+end
+plot(nanmean(exbeh,2),'k','linewidth',2);
+%expccum = cumsum(nanmean(cov_neur,2))./cumsum(nanmean(var_neur,2));
+%plot(ones(4,1)*expccum(128),'color',.8*[1 1 1])
+box off;
+axis square;
+ylabel({'variance','explained'});
 grid on;
 grid minor;
 grid minor;
-set(gca,'xtick',2.^[0:2:10],'ytick',[0:.2:1]);
+set(gca,'xtick',[1:4],'ytick',[0:.05:1],'xticklabel',...
+	{'\color[rgb]{.2,.8,.2} run','\color[rgb]{.5,.6,.5} pupil','\color[rgb]{.1,.9,.6}whisk','all 3'});
+set(gca,'XTickLabelRotation',45)
 axis tight;
-axis([0 64 0 1]);
-
+title('PC 1-128','fontweight','normal');
 % %
 % for j = [1 2 3]
 %     switch j
@@ -338,7 +401,7 @@ axis([0 64 0 1]);
 %     axis tight;
 % end
 
-%
+%%
 tstr{1} = 'imaging setup';
 tstr{2} = '';
 tstr{3} = '';
