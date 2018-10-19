@@ -1,17 +1,17 @@
 clear all
 
 % you should change this to your local data paths
-%dataroot = '/media/carsen/DATA2/grive/10krecordings/spontData';
-dataroot = 'D:/grive/10krecordings/spontData';
+dataroot = '/media/carsen/DATA2/grive/10krecordings/spontData';
+%dataroot = 'D:/grive/10krecordings/spontData';
 
 % give a local folder for saving intermediate data (3GB max)
-%matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
-matroot = 'D:/grive/10krecordings/spontResults';
+matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
+%matroot = 'D:/grive/10krecordings/spontResults';
 
 mkdir(matroot)
 
 % do you have a GPU? if not set to 0
-useGPU = 0;
+useGPU = 1;
 
 % should be in github folder
 addpath(genpath('.'));

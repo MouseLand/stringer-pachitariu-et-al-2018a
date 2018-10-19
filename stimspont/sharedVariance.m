@@ -133,7 +133,7 @@ for d = 1:length(dbs)
         end
         
         Vp = sum(sum(p(:,:,1).*p(:,:,2)));
-        
+        		
         % fraction of stimulus variance in shared stim-spont space
         results.Vshared(:,d,ktype) = (sum(pshared(:,:,1).*pshared(:,:,2),1)/Vtot)';
         
@@ -152,11 +152,7 @@ for d = 1:length(dbs)
 	%% subtract shared and compute stim variance
 	clear Ssub;
 	results.svper = zeros(4,3);
-	for ktype=1:2
-		ushared = results.Ushared{d,ktype};
-		Ssub{ktype} = usub{ktype} - ushared * (ushared'*usub{ktype});
-	end
-	ushared = results.Ushared{d,1};
+	
 	ytrain = [];
     ytest=[];
     istims=[];
@@ -174,6 +170,9 @@ for d = 1:length(dbs)
 		istimout(iss(floor(2*ni/3)+[1:floor(ni/3)])) = NaN;
     end
     usub{3} = normc(yf');
+	
+	ushared = results.Ushared{d,1};
+	
     Ssub{3} = usub{3} - ushared * (ushared'*usub{3});
 	Ssub{3} = normc(Ssub{3});
     [u,s,v] = svdecon(double(Ssub{3}));

@@ -185,14 +185,19 @@ k=0;
 isti = [22 1];
 hold all;
 k=0;
+cs(1,:) = [.5 .2 .7];
+cs(2,:) = [1 .5 1];
 for j = isti
     k=k+1;
     plot(projstim{1}{3}(istims{1}==j,isti(1)),projstim{1}{3}(istims{1}==j,isti(2)),'.','color',cs(k,:));
 	plot(Rfit{1}{3}(istims{1}==j,isti(1)), Rfit{1}{3}(istims{1}==j,isti(2)), 'k','linewidth',0.5);
     %text(1.1,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
 end
-
+text(1.2,1,'stim 1', 'color',cs(1,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
+text(1.2,0.85,'stim 2', 'color',cs(2,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
+text(1.2,0.7,{'multiplicative','model'},'HorizontalAlignment','right','fontangle','normal','fontsize',8);
 axis tight;
+axis([0 250 0 220]);
 axis square;
 box off;
 xlabel('stim-only 1');
@@ -216,7 +221,7 @@ for d = 1:4
 	end
 end
 title('stim-only dims','fontweight','normal');
-set(gca,'xtick',[1:4],'xticklabel',{'signal var','signal var (mult)','signal var (affine)','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
+set(gca,'xtick',[1:4],'xticklabel',{'avg. model','mult. model','affine model','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
 set(gca,'XTickLabelRotation',45);
 xlim([.5 4.5]);
 ylabel({'fraction of variance'});
@@ -275,7 +280,7 @@ for d = 1:4
 	end
 end
 title('face-only dims','fontweight','normal');
-set(gca,'xtick',[1:4],'xticklabel',{'signal var','signal var (mult)','signal var (affine)','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
+set(gca,'xtick',[1:4],'xticklabel',{'avg. model','mult. model','affine model','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
 set(gca,'XTickLabelRotation',45);
 ylim([0 1.05]);
 xlim([.5 4.5]);
