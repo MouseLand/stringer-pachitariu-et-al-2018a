@@ -216,7 +216,7 @@ for d = 1:length(dbs)
 	for k=1:3
 		for additive = 0:1
 			if additive == 0
-				[results.fitmult(additive+1,k,d),results.multgain{d}] = fitAffine(results.projstim{d}{k}, results.istims{d}, additive);
+				[results.fitmult(additive+1,k,d),results.multgain{d}{k},results.Rfit{d}{k}] = fitAffine(results.projstim{d}{k}, results.istims{d}, additive);
 			else
 				results.fitmult(additive+1,k,d) = fitAffine(results.projstim{d}{k}, results.istims{d}, additive);
 				if k==3

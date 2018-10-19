@@ -170,25 +170,6 @@ axis off;
 axis tight;
 
 
-i=i+1;
-hs{i}=my_subplot(6,2,8,[.7 .4]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.02;
-id = [3 1 2];
-for d = 1:4
-	hold all;
-	for j = 1:3
-		for k = 1:3
-			plot([1:3]+(k-1)*3, mean(vsigstimspont(:,:,id(k),d),1)/mean(mean(vsigstimspont(:,2:3,id(k),d),1),2),'color',cdat(d,:));
-		end
-	end
-end
-title('stim-only dims     face-only dims      spont-only dims','fontweight','normal');
-set(gca,'xtick',[1:9],'xticklabel',{'signal var','stim period','spont period','signal var','stim period','spont period','signal var','stim period','spont period'});
-set(gca,'XTickLabelRotation',45);
-xlim([.5 9.5]);
-ylabel({'normalized','variance'});
-
-
 dx = .7;
 dy = .65;
 %istims1 = istims;
@@ -197,53 +178,77 @@ dy = .65;
 %istims2(floor(length(istims2)/2)+1:end) = 0;
 
 i=i+1;
-hs{i}=my_subplot(6,4,19,[dx dy]);
+hs{i}=my_subplot(6,4,15,[dx dy]);
 hs{i}.Position(2)=hs{i}.Position(2)+0.005;
 hold all;
 k=0;
-isti = [22 31];
+isti = [22 1];
 hold all;
 k=0;
 for j = isti
     k=k+1;
-    plot(projstim{3}(istims==j,isti(1)),projstim{3}(istims==j,isti(2)),'.','color',cs(k,:));
+    plot(projstim{1}{3}(istims{1}==j,isti(1)),projstim{1}{3}(istims{1}==j,isti(2)),'.','color',cs(k,:));
+	plot(Rfit{1}{3}(istims{1}==j,isti(1)), Rfit{1}{3}(istims{1}==j,isti(2)), 'k','linewidth',0.5);
     %text(1.1,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
 end
+
 axis tight;
 axis square;
 box off;
 xlabel('stim-only 1');
 ylabel('stim-only 2');
-
-% normalize projstim by dimensions
-projstimStim = projstim{3} ./ sqrt(sum(projstim{3}.^2,2));
 
 i=i+1;
-hs{i}=my_subplot(6,4,20,[dx dy]);
+hs{i}=my_subplot(6,4,16,[dx dy]);
 hs{i}.Position(2)=hs{i}.Position(2)+0.005;
-hold all;
-k=0;
-for j = isti
-    k=k+1;
-    plot(projstimStim(istims==j,isti(1)),projstimStim(istims==j,isti(2)),'.','color',cs(k,:));
-    %text(1.1,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
+id = [3 1 2];
+k=1;
+normv = zeros(4,4);
+normv0= sum(vsigstimspont(:,:,id(k),:),1)./sum(vsigstimspont(:,2,id(k),:),1);
+normv0 = squeeze(normv0);
+normv([1 4],:) = normv0([1 3],:);
+normv(2:3,:) = squeeze(fitmult(:,id(k),:));
+
+for d = 1:4
+	hold all;
+	for j = 1:3
+		plot([1:4]+(k-1)*3, normv(:,d),'o','color',cm(d,:),'markersize',4);
+	end
 end
-axis tight;
-axis square;
+title('stim-only dims','fontweight','normal');
+set(gca,'xtick',[1:4],'xticklabel',{'signal var','signal var (mult)','signal var (affine)','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
+set(gca,'XTickLabelRotation',45);
+xlim([.5 4.5]);
+ylabel({'fraction of variance'});
+axis square
+
+
+% normalize projstim by dimensions
+i=i+1;
+hs{i}=my_subplot(6,2,10,[.8 .4]);
+hs{i}.Position(2)=hs{i}.Position(2)-.01;
+x = multgain{1}{3};
+y = projstim{1}{4};
+a = (x'*x)\(x'*y);
+hold all;
+tstim=[100:500];
+plot(y(tstim),'color',.4*[1 1 1],'linewidth',1);
+plot(x(tstim)*a,'r','linewidth',0.5)
+text(0,1.25,'stim-face shared dim','color',.4*[1 1 1],'fontangle','normal','fontsize',8);
+text(0,1,'multiplicative gain','color','r','fontangle','normal','fontsize',8);
 box off;
-xlabel('stim-only 1');
-ylabel('stim-only 2');
-
-
+axis tight;
+axis off;
 
 i=i+1;
 hs{i}=my_subplot(6,4,19+4,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.00;
+hs{i}.Position(2)=hs{i}.Position(2)+0.05;
 hold all;
 k=0;
 for j = isti
     k=k+1;
-    plot(projstim{1}(istims==j,1),projstim{1}(istims==j,2),'.','color',cs(k,:));
+    plot(projstim{1}{1}(istims{1}==j,1),projstim{1}{1}(istims{1}==j,2),'.','color',cs(k,:));
+	%plot(Rfit{1}{1}(istims{1}==j,isti(1)), Rfit{1}{1}(istims{1}==j,isti(2)), 'k','linewidth',0.5);
     %text(1.3,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
 end
 axis tight;
@@ -251,32 +256,35 @@ axis square;
 box off;
 xlabel('face-only 1');
 ylabel('face-only 2');
-
-% normalize projstim by dimensions
-projstimFace = projstim{1} ./ sqrt(sum(projstim{1}.^2,2));
 
 i=i+1;
-hs{i}=my_subplot(6,4,20+4,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.00;
-hold all;
-k=0;
-for j = isti
-    k=k+1;
-    plot(projstimFace(istims==j,1),projstimFace(istims==j,2),'.','color',cs(k,:));
-    %text(1.3,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
+hs{i}=my_subplot(6,4,24,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)+0.05;
+id = [1];
+k=1;
+normv = zeros(4,4);
+normv0= sum(vsigstimspont(:,:,id(k),:),1)./sum(vsigstimspont(:,2,id(k),:),1);
+normv0 = squeeze(normv0);
+normv([1 4],:) = normv0([1 3],:);
+normv(2:3,:) = squeeze(fitmult(:,id(k),:));
+
+for d = 1:4
+	hold all;
+	for j = 1:3
+		plot([1:4]+(k-1)*3, normv(:,d),'o','color',cm(d,:),'markersize',4);
+	end
 end
-axis tight;
+title('face-only dims','fontweight','normal');
+set(gca,'xtick',[1:4],'xticklabel',{'signal var','signal var (mult)','signal var (affine)','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
+set(gca,'XTickLabelRotation',45);
+ylim([0 1.05]);
+xlim([.5 4.5]);
+ylabel({'fraction of variance'});
 axis square;
-box off;
-xlabel('face-only 1');
-ylabel('face-only 2');
-
-
-
 
 tstr{1} = 'Behavior and neural activity with/without visual stimulation';
 tstr{2} = 'Variance of face PCs';
-tstr{3} = 'Stim-face dims';
+tstr{3} = 'Stim-face shared dims';
 tstr{4} = 'Top dimension';
 tstr{5} = '';
 tstr{6} = 'Projections of neural activity';
