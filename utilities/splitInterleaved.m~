@@ -8,5 +8,5 @@ Ntrain = ceil(fractrain * Nblocks);
 Ntest  = Nblocks - Ntrain;
 
 itrain = ismember(indx, sort(irand(1:Ntrain)));
-itest  = ismember(indx, sort(irand((1+Ntrain):Nblocks)));
+itest  = ismember(indx, irand((1+Ntrain):Nblocks));
     

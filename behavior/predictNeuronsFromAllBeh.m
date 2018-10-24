@@ -165,6 +165,14 @@ for d = [1:length(dall.db)]
         %% sort data by 1D embedding
         if btype == 9
             if d == dex
+				% options for clustering (see activityMap.m)
+				nC =30;
+				ops.nCall = [nC 100]; % number of clusters
+				ops.iPC = 1:200; % PCs to use
+				ops.useGPU = useGPU; % whether to use GPU
+				ops.upsamp = 100; % upsampling factor for the embedding position
+				ops.sigUp = 1; % stddev for upsampling
+				
                 [isort, ~, Sm] = mapTmap(Ff,ops);
 				yt = y(isort,indtest);
                 ytstd = max(1e-3,std(yt,1,2));

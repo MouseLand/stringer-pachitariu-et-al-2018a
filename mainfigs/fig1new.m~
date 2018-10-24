@@ -210,7 +210,7 @@ axis image;
 
 % ----- PEER PRED PC TRACES ---------%
 i=i+1;
-hs{i}=my_subplot(5,3,11,[.65 .7]);
+hs{i}=my_subplot(5,3,11,[.7 .7]);
 hs{i}.Position(1) = hs{i}.Position(1)-.05;
 hs{i}.Position(2) = hs{i}.Position(2)-.06;
 v2 = exampleV2 - mean(exampleV1,2);
@@ -275,7 +275,7 @@ end
 i=i+1;
 hs{i}=my_subplot(5,5,21,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
-hs{i}.Position(1)=hs{i}.Position(1)+.025;
+hs{i}.Position(1)=hs{i}.Position(1)+.01;
 for d = 1:ndat
     semilogx(cov_neur(:,d)./var_neur(:,d),'color',cdat(d,:),'linewidth',0.5);
     hold all;
@@ -298,7 +298,7 @@ ylim([0 1]);
 i=i+1;
 hs{i}=my_subplot(5,5,22,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
-hs{i}.Position(1)=hs{i}.Position(1)+.02;
+hs{i}.Position(1)=hs{i}.Position(1)+.025;
 for d = 1:ndat
 	loglog(cov_neur(:,d)/sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5)
 	hold all;
@@ -320,7 +320,7 @@ grid minor;
 i=i+1;
 hs{i}=my_subplot(5,5,23,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
-hs{i}.Position(1)=hs{i}.Position(1)+.01;
+hs{i}.Position(1)=hs{i}.Position(1)+.02;
 for d = 1:ndat
     semilogx(cumsum(cov_neur(:,d))./sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5);
     hold all;
@@ -418,26 +418,21 @@ end
 
 % -------------- LETTERS
 hp=.05;
-hy=1.32;
+hy=1.35;
 deffont=8;
 for j = [1:length(hs)]
     if j==6
-        hp0 =0.04;
+        hp0 =hp;
         hy0 = 1.7;
 	elseif j==7
+		hp0 = hp;
 		hy0 = 1.;
 	elseif j==8
 		hp0=0;
 		hy0=1;
-	elseif j==9
-		hp0=0.07;
-		hy0=1.12;
-	elseif j==10
-		hp0=0.04;
-		hy0=hy;		
 	elseif j>10
-		hp0=.08;
-		hy0=1.25;
+		hp0=.075;
+		hy0=1.28;
     else
         hp0=hp;
         hy0 = hy;
@@ -461,8 +456,50 @@ for j = [1:length(hs)]
     
 end
 
-%
-print(fullfile(matroot,'fig1new.pdf'),'-dpdf');
+
+%%
 
 
+% ----- PEER PRED TOTAL ---------%
+i=i+1;
+hs{i}=my_subplot(5,4,20,[xh yh]);
+for d = 1:ndat
+    semilogx(ndims0,expv_neurons(:,d),'color',cdat(d,:),'linewidth',1);
+    hold all;
+end
+semilogx(ndims0,mean(expv_neurons,2),'k','linewidth',2);
+box off;
+axis square;
+xlabel('dimensions');
+ylabel({'variance explained','(test set)'});
+grid on;
+grid minor;
+grid minor;
+set(gca,'xtick',2.^[0:4:10],'ytick',[0:.10:.30]);
+
+
+
+
+% ------ PEER PRED DIAGRAM ------ %
+i=i+1;
+hs{i}=my_subplot(5,4,17,[xh yh]);
+axis off;
+hold all;
+msize = 6;
+nls = [8 4 1];
+for j = 1:length(nls)
+    call{j} = repmat([0 0 0],nls(j),1);
+end
+call{2} = cpc;
+ells = [3 3 0];
+hp=hs{i}.Position;
+hp(1)=hp(1)-.05;
+hp(3)=hp(3)+.03;
+hp(2)=hp(2)-.04;
+hp(4)=hp(4)+.02;
+layeredNet(hp, nls, call, msize,ells);
+text(0,1.23,'peers','HorizontalAlignment','center','fontsize',8);
+text(.5,1.03,'neural PCs','HorizontalAlignment','center','fontsize',8);
+text(1,0.5,{'single','neuron','activity'},'HorizontalAlignment','center','fontsize',8);
+axis off;
 

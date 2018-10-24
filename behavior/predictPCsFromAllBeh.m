@@ -5,9 +5,10 @@ dall=load(fullfile(dataroot, 'dbspont.mat'));
 ndims0 = [1 2 3 4 8 16 32 64 128];
 npc = 128;
 
+clear results
 %%
-cov_res_beh = NaN*zeros(1024,length(ndims0),length(dall.db),10);
-var_beh = NaN*zeros(1024,length(ndims0),length(dall.db),10);
+results.cov_res_beh = NaN*zeros(1024,length(ndims0),length(dall.db),10);
+results.var_beh = NaN*zeros(1024,length(ndims0),length(dall.db),10);
 rng('default');
 %%
 for d = [1:length(dall.db)]
@@ -67,6 +68,10 @@ for d = [1:length(dall.db)]
         Ff = gpuArray(single(Ff));
 	end
 	
+	cov = Ff(ntrain,itrain) * Ff(ntest,itrain)';
+	[u,s,v] = svdecon(cov);
+	u = u(:,1:1024);
+	v = v(:,1:1024);
     %% loop over behavioral predictors
     
     for btype = [1:10]
@@ -109,10 +114,6 @@ for d = [1:length(dall.db)]
         ndims1 = ndims0(ndims0<=size(x,1));
         
 		%%
-		cov = Ff(ntrain,itrain) * Ff(ntest,itrain)';
-		[u,s,v] = svdecon(cov);
-		u = u(:,1:1024);
-		v = v(:,1:1024);
 		
 		[atrain, btrain] = CanonCor2(Ff(ntrain,itrain)'*u, x(:,itrain)', .15);
         [atest, btest] = CanonCor2(Ff(ntest,itrain)'*v, x(:,itrain)', .15);
@@ -122,19 +123,57 @@ for d = [1:length(dall.db)]
 			vp_train     = atrain(:,1:n) * btrain(:,1:n)' * x(:,itest);
 			vp_test      = atest(:,1:n) * btest(:,1:n)' * x(:,itest);
         
+			
 			s1 = u' * Ff(ntrain,itest) - vp_train;
 			s2 = v' * Ff(ntest,itest) - vp_test;
 			sout = sum(s1 .* s2, 2);
 			vars = sum((u' * Ff(ntrain,itest)).^2 + (v' * Ff(ntest,itest)).^2,2)/2;
 			if k==6
 				semilogx(sout./vars)
+				ypred = [u*vp_train; v*vp_test];
+				vpred = vp_test;
 			end
 
-			cov_res_beh(:,k,d,btype) = gather_try(sout);
-			var_beh(:,k,d,btype) = gather_try(vars);
+			results.cov_res_beh(:,k,d,btype) = gather_try(sout);
+			results.var_beh(:,k,d,btype) = gather_try(vars);
 			drawnow;
 			hold all;
-		end  
+		end
+		
+		%% sort data by 1D embedding
+        if btype == 9
+            if d == dex
+				nC =30;
+				ops.nCall = [nC 100]; % number of clusters
+				ops.iPC = 1:200; % PCs to use
+				ops.useGPU = useGPU; % whether to use GPU
+				ops.upsamp = 100; % upsampling factor for the embedding position
+				ops.sigUp = 1; % stddev for upsampling
+				
+                [isort, ~, Sm] = mapTmap(Ff([ntrain;ntest],:),ops);
+				%%
+				ytest = Ff([ntrain;ntest],itest);
+                ytstd = max(1e-3,std(ytest,1,2));
+                yt = ytest ./ ytstd;
+                yp = ypred(isort,:) ./ ytstd;
+            
+                yt = my_conv2(yt(isort,:),3,1);
+                yp = my_conv2(yp,1,1);
+				clf;
+				imagesc(yt);
+				
+                %ccembed(d) = corr(yt(:),yp(:));
+                %disp(ccembed);
+
+                results.vtest{d} = gather_try(v'*Ff(ntest,itest));
+                results.vpred{d} = gather_try(vpred);
+                results.ypred{d} = gather_try(ypred);
+                results.ytest{d} = gather_try(ytest);
+                results.isortembed{d} = isort;
+                results.xtest{d} = x(1:1000,itest);
+            end
+        end
+		
     end
     
 end
