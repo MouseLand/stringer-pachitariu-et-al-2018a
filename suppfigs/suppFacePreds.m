@@ -2,7 +2,7 @@ close all;
 default_figure([15 1 9 9]);
 
 %%
-tstart = [1000 190 1 1700 300 1 200 300 1];
+tstart = [1000 190 1 1850 300 1 200 300 1];
 
 clf;
 dp = [1:9];
@@ -54,4 +54,4 @@ cm=colormap('gray');
 colormap(flipud(cm));
 
 %%
-print('../figs/suppFacePreds.pdf','-dpdf','-bestfit');
+print(fullfile(matroot,'suppFacePreds.pdf'),'-dpdf');

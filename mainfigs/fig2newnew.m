@@ -3,7 +3,6 @@ function fig2new(matroot)
 load('exampleMovie.mat');
 load(fullfile(matroot,'example_behavior.mat'));
 load(fullfile(matroot,'PCpredict.mat'));
-load(fullfile(matroot,'expv_behavior_neurons.mat'));
 load(fullfile(matroot,'expv_behavior_PC.mat'));
 try
     load(fullfile(matroot,'expv_timedelay.mat'));
@@ -46,8 +45,7 @@ cpc = max(0,colormap('spring'));
 cpc = cpc(1:32,:);
 cpc = cpc(round(linspace(1,size(cpc,1),nPCs)),:);
 spc = [-1 1 -1 -1];
-ndat = size(expv_behavior,2);
-cdat = cdat(round(linspace(1,size(cdat,1),size(expv_behavior,2))),:);
+ndat = size(cdat,1);
 
 i = 0;
 
@@ -143,93 +141,12 @@ annotation('arrow',[x0 x1],[y0 y0]);
 % grid minor;
 % grid minor;
 
-% ------------ RASTERS
-trange = 0+[1:1700];
-%trange = [trange(5:end-13) 830+[1:45]];% 1200+[1:50]];
-i=i+1;
-hs{i}=my_subplot(4,2,3,[.85 .8]);
-hs{i}.Position(2) = hs{i}.Position(2) +.02; 
-%hs{i}.Position(1) = .37;
-%hs{i}.Position(3) = .6;
-%hs{i}.Position(2) = hs{i-2}.Position(2)-.02;
-%hs{i}.Position(1) = hs{4}.Position(1);
-%hs{i}.Position(2) = hs{i}.Position(2) + .025;
-%hs{i}.Position(4) = .22;
-yt = ytest{dex}(isortembed{dex},trange);
-yt = circshift(yt,600,1);
-ytstd = max(1e-3,std(yt,1,2));
-yt = yt ./ ytstd;
-imagesc(my_conv2(yt, 2, 1),[0 .8])
-colormap(hs{i},flipud(cgray));
-axis off;
-text(0,1.15,'Neural activity (test set) sorted by 1D embedding','fontangle','normal','fontsize',8);
-NN=size(yt,1);
-hold all;
-plot([0 10/1.2], (NN+100)*[1 1],'k');
-plot([0 0]-0, NN+[0 -1000],'k');
-ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
-ht.Rotation=90;
-text(0,0,'10 s','fontsize',8,'fontangle','normal');
-axis tight;
-
-hp=my_subplot(4,2,4,[.85 .8]);
-%hp.Position(1) = hs{i}.Position(1);
-%hp.Position(3) = hs{i}.Position(3);
-%hp.Position(1) = hs{4}.Position(1);
-hp.Position(2) = hs{i}.Position(2);
-%hp.Position(4) = .22;
-yp = ypred{dex}(isortembed{dex},trange);
-yp = circshift(yp,600,1);
-%yp = my_conv2(yp, 0.5, 1);
-yp = yp ./ ytstd; % scale prediction by same amount
-imagesc(yp,[0 .8])
-colormap(hp,flipud(cgray));
-axis off;
-text(0,1.15,'Neural activity prediction (test set) from faces','fontangle','normal','fontsize',8);
-ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
-ht.Rotation=90;
-hold all;
-plot([0 10/1.2], (NN+100)*[1 1],'k');
-plot([0 0]-0, NN+[0 -1000],'k');
-text(0,0,'10 s','fontsize',8,'fontangle','normal');
-axis tight;
-
-
-% ------------ PC VAR EXP ------------%
-i=i+1;
-hs{i} = my_subplot(4,4,9,[.7 .7]);
-hs{i}.Position(1) = hs{i}.Position(1) + .05;
-hs{i}.Position(2) = hs{i}.Position(2)+.03;
-hold all;
-shadedErrorBar([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,2),...
-	std((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,1,2)/sqrt(ndat-1),{'color','b','linewidth',1});
-shadedErrorBar([1:1024],mean(cov_neur./var_neur,2),...
-	std(cov_neur./var_neur,1,2)/sqrt(ndat-1),{'color',.8*[1 1 1],'linewidth',1});
-shadedErrorBar([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,2),...
-	std((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,1,2)/sqrt(ndat-1),{'color',[0 0.2 0],'linewidth',1});
-%axis([0 .06 0 .06]);
-set(gca,'xtick',10.^[0 1 2])
-ylabel({'variance explained','(test set)'});
-text(.4,1.1,{'max','explainable'},'color',.6*[1 1 1],'fontsize',8)
-text(1.1,0.3,{'run+pupil','+whisk'},'HorizontalAlignment','right','fontangle','normal','fontsize',8,'color',[0 .2 0]);
-text(.1,0.7,'face','fontangle','normal','fontsize',8,'color','b');
-xlabel('PC dimension');
-box off;
-axis square;
-axis tight;
-ylim([0 1]);
-xlim([0 128]);
-set(gca,'xscale','log');
-grid on;
-grid minor;
-grid minor;
-
 
 % ---------- SCHEMATIC ------------------%
 i=i+1;
-hs{i} = my_subplot(4,5,13,[1 .6]);
-hs{i}.Position(2)=hs{i}.Position(2)+.02;
-hs{i}.Position(1) = hs{i}.Position(1) - .04;
+hs{i} = my_subplot(4,5,6,[1 .6]);
+hs{i}.Position(2)=hs{i}.Position(2)+.04;
+hs{i}.Position(1) = hs{i}.Position(1) + .04;
 hold all;
 trange = 200+[1:100];
 NT = length(trange);
@@ -245,8 +162,8 @@ axis off;
 text(0,1.2,'motion energy PCs','fontsize',8);
 text(1.95,1.2,'neural PCs','fontsize',8);
 text(1.35,1,'rank','fontsize',8);
-h2=my_subplot(4,5,15,[1 .6]);
-h2.Position(1) = h2.Position(1) -.02;
+h2=my_subplot(4,5,8,[1 .6]);
+h2.Position(1) = h2.Position(1) +.04;
 h2.Position(2) = hs{i}.Position(2) + .0;
 hold all;
 cp = .4*[1 1 1];
@@ -255,6 +172,9 @@ for j = 1:nPCs
     pred=vpred{dex}(j,trange);
     pred = pred / std(xp);
     xp = xp / std(xp);
+	ssk = sign(skewness(xp));
+	xp = xp * ssk;
+	pred = pred*ssk;
     r = corr(vtest{dex}(j,:)',vpred{dex}(j,:)');
     plot(NT*3+[1:NT],+xp-j*8, 'color', cpc(j,:));
     plot(NT*3+[1:NT],pred-j*8, 'color', cp);
@@ -291,13 +211,93 @@ end
 axis tight;
 axis off;
 
-xh=.6;
-yh=.65;
+% ------------ PC VAR EXP ------------%
+i=i+1;
+hs{i} = my_subplot(4,4,8,[.7 .7]);
+hs{i}.Position(1) = hs{i}.Position(1) -.01;
+hs{i}.Position(2) = hs{i}.Position(2)+.04;
+hold all;
+shadedErrorBar([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,2),...
+	std((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,1,2)/sqrt(ndat-1),{'color','b','linewidth',1});
+shadedErrorBar([1:1024],mean(cov_neur./var_neur,2),...
+	std(cov_neur./var_neur,1,2)/sqrt(ndat-1),{'color',.8*[1 1 1],'linewidth',1});
+shadedErrorBar([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,2),...
+	std((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,1,2)/sqrt(ndat-1),{'color',[0 0.2 0],'linewidth',1});
+%axis([0 .06 0 .06]);
+set(gca,'xtick',10.^[0 1 2])
+ylabel({'variance explained','(test set)'});
+text(.4,1.1,{'max','explainable'},'color',.6*[1 1 1],'fontsize',8)
+text(1.1,0.3,{'run+pupil','+whisk'},'HorizontalAlignment','right','fontangle','normal','fontsize',8,'color',[0 .2 0]);
+text(.1,0.7,'face','fontangle','normal','fontsize',8,'color','b');
+xlabel('PC dimension');
+box off;
+axis square;
+axis tight;
+ylim([0 1]);
+xlim([0 128]);
+set(gca,'xscale','log');
+grid on;
+grid minor;
+grid minor;
+
+
+% ------------ RASTERS
+trange = 200+[1:300];%[800:1300];
+%trange = [trange(5:end-13) 830+[1:45]];% 1200+[1:50]];
+i=i+1;
+hs{i}=my_subplot(4,2,5,[.85 .8]);
+hs{i}.Position(2) = hs{i}.Position(2) +.01; 
+%hs{i}.Position(1) = .37;
+%hs{i}.Position(3) = .6;
+%hs{i}.Position(2) = hs{i-2}.Position(2)-.02;
+%hs{i}.Position(1) = hs{4}.Position(1);
+%hs{i}.Position(2) = hs{i}.Position(2) + .025;
+%hs{i}.Position(4) = .22;
+yt = ytest{dex}(isortembed{dex},trange);
+ytstd = max(1e-3,std(yt,1,2));
+yt = yt ./ ytstd;
+imagesc(my_conv2(yt, 2, 1),[0 .8])
+colormap(hs{i},flipud(cgray));
+axis off;
+text(0,1.15,'Neural activity (test set) sorted by 1D embedding','fontangle','normal','fontsize',8);
+NN=size(yt,1);
+hold all;
+plot([0 10/1.2], (NN+100)*[1 1],'k');
+plot([0 0]-0, NN+[0 -1000],'k');
+ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
+ht.Rotation=90;
+text(0,0,'10 s','fontsize',8,'fontangle','normal');
+axis tight;
+
+hp=my_subplot(4,2,6,[.85 .8]);
+%hp.Position(1) = hs{i}.Position(1);
+%hp.Position(3) = hs{i}.Position(3);
+%hp.Position(1) = hs{4}.Position(1);
+hp.Position(2) = hs{i}.Position(2);
+%hp.Position(4) = .22;
+yp = ypred{dex}(isortembed{dex},trange);
+yp = yp ./ ytstd; % scale prediction by same amount
+yp = my_conv2(yp, 1, 1);
+imagesc(yp,[0 .8])
+colormap(hp,flipud(cgray));
+axis off;
+text(0,1.15,'Neural activity prediction (test set) from faces','fontangle','normal','fontsize',8);
+ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
+ht.Rotation=90;
+hold all;
+plot([0 10/1.2], (NN+100)*[1 1],'k');
+plot([0 0]-0, NN+[0 -1000],'k');
+text(0,0,'10 s','fontsize',8,'fontangle','normal');
+axis tight;
+
+
+xh=.55;
+yh=.55;
 
 % --------------------- DIMS VS VAR EXP -------------- %
 i=i+1;
 hs{i} = my_subplot(4,4,13,[xh yh]);
-hs{i}.Position(1) = hs{i}.Position(1) + .03;
+hs{i}.Position(1) = hs{i}.Position(1) + .04;
 %hs{i}.Position(2) = hs{i}.Position(2)+.0;
 %hs{i}.Position(2) = hs{i-1}.Position(2);
 expcbeh = cumsum(cov_neur - permute(squeeze(cov_res_beh(:,:,:,9)),[1 3 2]))./cumsum(var_neur);
@@ -380,26 +380,28 @@ title('PC 1-128','fontweight','normal');
 
 % -------------- LETTERS
 hp=.065;
-hy=1.22;
+hy=1.25;
 deffont=8;
 for j = [1:length(hs)]
-    if j<5
+	if j== 5
+    	hp0=.11;
+		hy0=hy;
+    elseif j==4
         hp0 =0.03;
-        if j== 4
-            hy0 = 1.3;
-        else
-            hy0 = 1.1;
-        end
-    %elseif j==5
+        hy0 = 1.3;
+	elseif j<4
+		hp0=0.04;
+		hy0=1.1;
+	%elseif j==5
     %    hy0=1.1;
     %    hp0=.065;
     elseif j==6
-        hp0=.09;
-        hy0=hy;
-    elseif j==7
         hp0=.03;
+        hy0=1.2;
+    elseif j==7
+        hp0=.1;
         hy0=hy;
-    else
+	else
         hp0=hp;
         hy0 = hy;
     end
@@ -420,7 +422,8 @@ tli = interp1(tlag,tl,[-8:.01:8]);
 fwhm = (800-ix1+ix2)*.01
 
 %%
-
+print(fullfile(matroot,'fig2new.pdf'),'-dpdf');
+%%
 
 % ---------- TIMELAG --------%
 i=i+1;

@@ -142,36 +142,34 @@ for d = [1:length(dall.db)]
 		
 		%% sort data by 1D embedding
         if btype == 9
-            if d == dex
-				nC =30;
-				ops.nCall = [nC 100]; % number of clusters
-				ops.iPC = 1:200; % PCs to use
-				ops.useGPU = useGPU; % whether to use GPU
-				ops.upsamp = 100; % upsampling factor for the embedding position
-				ops.sigUp = 1; % stddev for upsampling
-				
-                [isort, ~, Sm] = mapTmap(Ff([ntrain;ntest],:),ops);
-				%%
-				ytest = Ff([ntrain;ntest],itest);
-                ytstd = max(1e-3,std(ytest,1,2));
-                yt = ytest ./ ytstd;
-                yp = ypred(isort,:) ./ ytstd;
-            
-                yt = my_conv2(yt(isort,:),3,1);
-                yp = my_conv2(yp,1,1);
-				clf;
-				imagesc(yt);
-				
-                %ccembed(d) = corr(yt(:),yp(:));
-                %disp(ccembed);
+			nC =30;
+			ops.nCall = [nC 100]; % number of clusters
+			ops.iPC = 1:200; % PCs to use
+			ops.useGPU = useGPU; % whether to use GPU
+			ops.upsamp = 100; % upsampling factor for the embedding position
+			ops.sigUp = 1; % stddev for upsampling
 
-                results.vtest{d} = gather_try(v'*Ff(ntest,itest));
-                results.vpred{d} = gather_try(vpred);
-                results.ypred{d} = gather_try(ypred);
-                results.ytest{d} = gather_try(ytest);
-                results.isortembed{d} = isort;
-                results.xtest{d} = x(1:1000,itest);
-            end
+			[isort, ~, Sm] = mapTmap(Ff([ntrain;ntest],:),ops);
+			%%
+			ytest = Ff([ntrain;ntest],itest);
+			ytstd = max(1e-3,std(ytest,1,2));
+			yt = ytest ./ ytstd;
+			yp = ypred(isort,:) ./ ytstd;
+
+			yt = my_conv2(yt(isort,:),3,1);
+			yp = my_conv2(yp,1,1);
+			clf;
+			imagesc(yt);
+
+			%ccembed(d) = corr(yt(:),yp(:));
+			%disp(ccembed);
+
+			results.vtest{d} = gather_try(v'*Ff(ntest,itest));
+			results.vpred{d} = gather_try(vpred);
+			results.ypred{d} = gather_try(ypred);
+			results.ytest{d} = gather_try(ytest);
+			results.isortembed{d} = isort;
+			results.xtest{d} = x(1:500,itest);
         end
 		
     end
@@ -179,7 +177,9 @@ for d = [1:length(dall.db)]
 end
 
 %%
-save(fullfile(matroot,'expv_behavior_PC.mat'),'cov_res_beh','var_beh','ndims0');
+results.ndims0 = ndims0;
 
+%%
+save(fullfile(matroot,'expv_behavior_PC.mat'),'-struct', 'results');
 
 %%
