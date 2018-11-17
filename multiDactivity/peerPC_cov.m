@@ -66,6 +66,8 @@ for d = [1:length(dall.db)]
     end
     
     npc = 1024;%min(size(vtrain,2));
+	
+	[u2,~,~] = svdecon(Ff(ntrain,itrain));
     
 	cov = Ff(ntrain,itrain) * Ff(ntest,itrain)';
 	[u,s,v] = svdecon(cov);
@@ -75,6 +77,10 @@ for d = [1:length(dall.db)]
 	varneur = sum(s1.^2 + s2.^2,2)/2;
 	semilogx(sneur./varneur)
 		
+	cpc = corr(gather_try(s1(1,:)'), gather_try(Ff(ntrain,itest)' * u2(:,1)));
+	disp(cpc);
+	corrPC1(d) = cpc;
+	
 	cov_neur(:,d) = gather_try(sneur);
 	var_neur(:,d) = gather_try(varneur);
 	drawnow;
@@ -87,4 +93,4 @@ end
 
 %%
 
-save(fullfile(matroot,'PCpredict.mat'),'cov_neur','var_neur','exampleV1','exampleV2');
+save(fullfile(matroot,'PCpredict.mat'),'cov_neur','var_neur','exampleV1','exampleV2', 'corrPC1');

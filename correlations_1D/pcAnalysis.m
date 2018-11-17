@@ -93,6 +93,7 @@ for d = [1:length(dall.db)]
     ccall = corr(Fbin',Fbin');
     ccall = ccall - diag(NaN*diag(ccall));
     results.mcorr(d) = nanmean(ccall(:));
+	results.acorr(d) = nanmean(abs(ccall(:)));
     results.stdcorr(d,:) = [prctile(ccall(:), 5) prctile(ccall(:), 95)];
         
     % split recording in half in time and compute correlations on halves

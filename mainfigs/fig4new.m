@@ -10,7 +10,7 @@ default_figure([1 1 8 8.5]);
 
 %%
 rng('default');
-kt = 1; % face prediction
+ktype = 1; % spont prediction
 tpts = .645e4 + .03e4 + [1:.85e4];%2.09e4;
 
 dx = .25;
@@ -20,11 +20,12 @@ sdiff = diff(stimtpt);
 son = find(sdiff==1);
 soff = find(sdiff==-1);
 
-cs = colormap('cool');
-cs = cs(round(linspace(36,64,5)),:);
-rng(19);
-cs = max(0, cs - .1*(rand(5,1)<.5));
-cs = cs(randperm(size(cs,1)),:);
+cs = [];
+cs(1,:) = [.5 .2 .7];
+cs(2,:) = [1 .3 1];
+cs(3,:) = [.8 .3 .8];
+cs(4,:) = [.5 0 .5];
+cs(5,:) = [.7 .4 .7];
 
 yh=.02;
 X = [.05 .2 .35 .72];
@@ -79,10 +80,10 @@ hs{i} = my_subplot(4,6,4,[.55 .45]);
 hs{i}.Position(2) = hs{i}.Position(2) +.02;
 loglog([1e-3 1],[1e-3 1],'k','linewidth',.5)
 hold all;
-for j = 1:4
-    x = vface(1:10,1,j)/nansum(vface(:,1,j))*1;
-    y = vface(1:10,2,j)/nansum(vface(:,2,j))*1;
-    loglog(x,y,'.','color',cm(j,:),'markersize',8)
+for d = 1:4
+    x = vface(1:10,1,d)/nansum(vface(:,1,d))*1;
+    y = vface(1:10,2,d)/nansum(vface(:,2,d))*1;
+    loglog(x,y,'.','color',cm(d,:),'markersize',8)
 end
 %ylim([.8 1.2]);
 box off;
@@ -99,8 +100,8 @@ hs{i} = my_subplot(4,6,5,[.55 .45]);
 hs{i}.Position(2) = hs{i}.Position(2) +.02;
 hs{i}.Position(1) = hs{i}.Position(1) +.01;
 hold all;
-for j = 1:size(Vshared,2)
-    plot(Vshared(1:10,j,1)*100,'.-','markersize',8,'color',cm(j,:),'linewidth',.25)
+for d = 1:size(Vshared,2)
+    plot(Vshared(1:10,d,ktype)*100,'.-','markersize',8,'color',cm(d,:),'linewidth',.25)
 end
 box off;
 ylabel({'% stim variance'},'fontsize',8);
@@ -108,7 +109,7 @@ xlabel('dimension','fontsize',8);
 %title('stim-face subspace','fontweight','normal','fontangle','italic','fontsize',10)
 axis square;
 axis tight;
-ylim([0 15]);
+ylim([0 14]);
 set(gca,'xtick',[1 5 10]);
 
 
@@ -117,15 +118,17 @@ hs{i} = my_subplot(4,6,6,[.55 .45]);
 hs{i}.Position(2) = hs{i}.Position(2) +.02;
 hs{i}.Position(1) = hs{i}.Position(1) +.01;
 hold all;
-for j = 1:size(Ushared,1)
-    uplot = Ushared{j,kt};
+for d = 1:size(Ushared,1)
+    uplot = Ushared{d,ktype};
     uplot = uplot * sign(mean(uplot));
     bed = [-.02:.001:.035];
-    histogram(uplot,20,'binedges',bed,'edgecolor',cm(j,:),...
+    histogram(uplot,20,'binedges',bed,'edgecolor',cm(d,:),...
         'normalization','probability','displaystyle','stairs');
+	upos(d) = mean(Ushared{d,ktype}>0);
 end
 box off;
-xlim([-.02 .035]);
+axis tight;
+xlim([-.01 .03]);
 ylabel('fraction','fontsize',8);
 xlabel('neural weights','fontsize',8);
 %title('1st PC weights','fontweight','normal','fontangle','italic','fontsize',10)
@@ -134,7 +137,7 @@ axis square;
 i=i+1;
 hs{i} = my_subplot(4,2,4,[1.2 1.2]);
 %hs{i}.Position(1)=hs{i-3}.Position(1);
-hs{i}.Position(2)=hs{i}.Position(2)+.05;
+hs{i}.Position(2)=hs{i}.Position(2)+.065;
 hs{i}.Position(1)=hs{i}.Position(1)+.03;
 axis off;
 im=imread('schematicNEW.png');
@@ -143,21 +146,20 @@ axis tight;
 axis image
 axis off;
 
-kt = 1; % use face projections
-tshared1 = tshared{kt} * sign(mean(Ushared{1,kt}));
+tshared1 = tshared{1} * sign(mean(Ushared{1,1}));
 tshared2 = tshared{2} * sign(mean(Ushared{2,2}));
 i=i+1;
-hs{i} = my_subplot(2,2,3,[.85 .75]);
+hs{i} = my_subplot(2,2,3,[.85 .82]);
 hs{i}.Position(1) = hs{1}.Position(1);
-hs{i}.Position(2) = hs{i}.Position(2)+.03;
+hs{i}.Position(2) = hs{i}.Position(2)+.05;
 %hs{i}.Position(3) = .5;
 dobin=1;
 tproj1=tprojS{1}(1:3,:);
 tproj1= sign(skewness(tproj1,1,2)) .* tproj1;
 tproj2=tprojS{2}(1:3,:);
 tproj2= sign(skewness(tproj2,1,2)) .* tproj2;
-titles = {'stim-only','spont-only','face-only'};
-fig_traces(sprojS{kt}(1:2:10,tpts),tshared1(tpts),tproj1(:,tpts),tshared2(tpts),tproj2(:,tpts),cs,dobin,titles);
+titles = {'stim-only','behav-only','spont-only'};
+fig_traces(sprojS{ktype}(1:2:10,tpts),tshared1(tpts),tproj1(:,tpts),tshared2(tpts),tproj2(:,tpts),cs,dobin,titles);
 axes('position',[hs{i}.Position(1) hs{i}.Position(2)-yh hs{i}.Position(3) yh*.8]);
 fig_stimon(stimtpt(tpts),0);
 axes('position',[hs{i}.Position(1) hs{i}.Position(2)-4*yh hs{i}.Position(3) yh*2.8]);
@@ -165,7 +167,7 @@ plot(bin2d(runspeed(tpts),4),'color',[.2 .8 .2]);
 text(.2,1.0,'running','color',[.2 .8 .2],'fontangle','normal','fontsize',8);
 hold all;
 plot(1 + [0 60*5],-6 * [1 1],'k','linewidth',2);
-text(0.06,-.1,'5 min','horizontalalignment','center','fontsize',8,'fontweight','bold','fontangle','normal');
+text(0.06,-.1,'5 min','horizontalalignment','center','fontsize',8,'fontangle','normal');
 axis off;
 axis tight;
 
@@ -179,117 +181,158 @@ dy = .65;
 
 i=i+1;
 hs{i}=my_subplot(6,4,15,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.005;
+hs{i}.Position(2)=hs{i}.Position(2)+0.025;
+cp=[.4 .6 1; 0 0 0; 0.8 0.3 0.8; .5 .5 .5];
+ll=[squeeze(vsigstimspont(3,:,:)),squeeze(vsigstimspont(2,:,:))];
+ll = ll(:);
+loglog([min(ll) max(ll)],[min(ll) max(ll)],'k','linewidth',.5)
 hold all;
-k=0;
+for k=1:4
+	loglog(squeeze(vsigstimspont(3,k,:)),squeeze(vsigstimspont(2,k,:)),'x','color',cp(k,:))
+	hold all;
+end
+xx = .52;
+xy = .65;
+text(xy,1.15-xx,'stim-only','color',cp(3,:),'fontangle','normal','fontsize',8);
+text(xy,1-xx,'behav-only','color',cp(1,:),'fontangle','normal','fontsize',8);
+text(xy,.85-xx,'spont-only','color',cp(2,:),'fontangle','normal','fontsize',8);
+text(xy,.7-xx,'stim-behav','color',cp(4,:),'fontangle','normal','fontsize',8);
+xlabel('spont period');
+ylabel('stim period');
+title('projection variances','fontweight','normal');
+set(gca,'ytick',10.^[2:4]);
+axis square;
+box off;
+axis tight;
+
 isti = [22 1];
+cs(1,:) = [.5 .2 .7];
+cs(2,:) = [1 .3 1];
+
+i=i+1;
+hs{i}=my_subplot(6,4,16,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)+0.025;
 hold all;
 k=0;
-cs(1,:) = [.5 .2 .7];
-cs(2,:) = [1 .5 1];
 for j = isti
     k=k+1;
-    plot(projstim{1}{3}(istims{1}==j,isti(1)),projstim{1}{3}(istims{1}==j,isti(2)),'.','color',cs(k,:));
-	plot(Rfit{1}{3}(istims{1}==j,isti(1)), Rfit{1}{3}(istims{1}==j,isti(2)), 'k','linewidth',0.5);
+    plot(projstim{1}{3}(istims{1}==j,isti(1)),projstim{1}{3}(istims{1}==j,isti(2)),...
+		'.','color',cs(k,:),'markersize',5);
+	plot(Rfit{1}{3}(istims{1}==j,isti(1)), Rfit{1}{3}(istims{1}==j,isti(2)), 'r','linewidth',0.5);
     %text(1.1,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
 end
 text(1.2,1,'stim 1', 'color',cs(1,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
 text(1.2,0.85,'stim 2', 'color',cs(2,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
-text(1.2,0.7,{'multiplicative','model'},'HorizontalAlignment','right','fontangle','normal','fontsize',8);
-axis tight;
-axis([0 250 0 220]);
+text(1.2,0.7,{'multiplicative','gain model'},'color','r','HorizontalAlignment','right','fontangle','normal','fontsize',8);
+%axis tight;
+axis([-50 180 -20 150]);
+%axis([0 220 0 250]);
 axis square;
 box off;
-xlabel('stim-only 1');
-ylabel('stim-only 2');
+xlabel('stim-only proj1');
+ylabel('stim-only proj2');
 
 i=i+1;
-hs{i}=my_subplot(6,4,16,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.005;
-id = [3 1 2];
-k=1;
-normv = zeros(4,4);
-normv0= sum(vsigstimspont(:,:,id(k),:),1)./sum(vsigstimspont(:,2,id(k),:),1);
-normv0 = squeeze(normv0);
-normv([1 4],:) = normv0([1 3],:);
-normv(2:3,:) = squeeze(fitmult(:,id(k),:));
-
-for d = 1:4
-	hold all;
-	for j = 1:3
-		plot([1:4]+(k-1)*3, normv(:,d),'o','color',cm(d,:),'markersize',4);
-	end
-end
-title('stim-only dims','fontweight','normal');
-set(gca,'xtick',[1:4],'xticklabel',{'avg. model','mult. model','affine model','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
-set(gca,'XTickLabelRotation',45);
-xlim([.5 4.5]);
-ylabel({'fraction of variance'});
-axis square
-
-
-% normalize projstim by dimensions
-i=i+1;
-hs{i}=my_subplot(6,2,10,[.8 .4]);
-hs{i}.Position(2)=hs{i}.Position(2)-.01;
-x = multgain{1}{3};
-y = projstim{1}{4};
-a = (x'*x)\(x'*y);
-hold all;
-tstim=[100:500];
-plot(y(tstim),'color',.4*[1 1 1],'linewidth',1);
-plot(x(tstim)*a,'r','linewidth',0.5)
-text(0,1.25,'stim-face shared dim','color',.4*[1 1 1],'fontangle','normal','fontsize',8);
-text(0,1,'multiplicative gain','color','r','fontangle','normal','fontsize',8);
-box off;
-axis tight;
-axis off;
-
-i=i+1;
-hs{i}=my_subplot(6,4,19+4,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.05;
+hs{i}=my_subplot(6,4,19,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)+0.02;
 hold all;
 k=0;
 for j = isti
     k=k+1;
-    plot(projstim{1}{1}(istims{1}==j,1),projstim{1}{1}(istims{1}==j,2),'.','color',cs(k,:));
+    plot(projstim{1}{ktype}(istims{1}==j,1),projstim{1}{ktype}(istims{1}==j,2)*-1,...
+		'.','color',cs(k,:),'markersize',5);
 	%plot(Rfit{1}{1}(istims{1}==j,isti(1)), Rfit{1}{1}(istims{1}==j,isti(2)), 'k','linewidth',0.5);
     %text(1.3,1-(k-1)*.15,sprintf('stim %d',k),'color',cs(k,:),'fontangle','normal','fontsize',8,'HorizontalAlignment','right')
 end
 axis tight;
 axis square;
 box off;
-xlabel('face-only 1');
-ylabel('face-only 2');
+xlabel('behav-only proj1');
+ylabel('behav-only proj2');
+text(1.4,1,'stim 1', 'color',cs(1,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
+text(1.4,0.85,'stim 2', 'color',cs(2,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
+
+
+% i=i+1;
+% hs{i}=my_subplot(6,4,20,[dx dy]);
+% hs{i}.Position(2)=hs{i}.Position(2)+0.02;
+% k=1;
+% normv = squeeze(vsigstimspont(4,[3 2 1 4],:));% ./ sum(vsigstimspont(2,[1 3:4],:),2));
+% randv = mean(squeeze(mean(vsigstimspont(4,5:end,:))));
+% for d = 1:4
+% 	hold all;
+% 	plot([1:size(normv,1)]+.05*randn(1,size(normv,1)), normv(:,d),'o-','color',cm(d,:),'markersize',4);
+% end
+% plot([0 size(normv,1)+1], randv * [1 1],'k--','linewidth',2);
+% text(1.3,.22,'random','HorizontalAlignment','right','fontsize',8)
+% %title({'stim responses','of projections'},'fontweight','normal');
+% set(gca,'xtick',[1:size(normv,1)],'xticklabel',{'stim-only','spont-only','behav-only','stim-behav'});
+% set(gca,'XTickLabelRotation',30);
+% xlim([.5 size(normv,1)+.5]);
+% ylabel({'signal-to-noise ratio'});
+% axis square;
+
 
 i=i+1;
-hs{i}=my_subplot(6,4,24,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.05;
+hs{i}=my_subplot(6,4,20,[dx dy]);
+hs{i}.Position(2)=hs{i}.Position(2)+0.02;
 id = [1];
-k=1;
-normv = zeros(4,4);
-normv0= sum(vsigstimspont(:,:,id(k),:),1)./sum(vsigstimspont(:,2,id(k),:),1);
-normv0 = squeeze(normv0);
-normv([1 4],:) = normv0([1 3],:);
-normv(2:3,:) = squeeze(fitmult(:,id(k),:));
-
+normv = squeeze(vsigstimspont(1,[3],:) ./ vsigstimspont(2,[3],:));
+normv = [normv'; squeeze(fitmult(:,3,:))];
 for d = 1:4
 	hold all;
-	for j = 1:3
-		plot([1:4]+(k-1)*3, normv(:,d),'o','color',cm(d,:),'markersize',4);
-	end
+	plot([1:size(normv,1)]+.05*randn(1,size(normv,1)), normv(:,d),'o-','color',cm(d,:),'markersize',4);
 end
-title('face-only dims','fontweight','normal');
-set(gca,'xtick',[1:4],'xticklabel',{'avg. model','mult. model','affine model','spont period var','signal var','stim period','spont period','signal var','stim period','spont period'});
-set(gca,'XTickLabelRotation',45);
-ylim([0 1.05]);
-xlim([.5 4.5]);
-ylabel({'fraction of variance'});
+%title('spont periods','fontweight','normal');
+set(gca,'xtick',[1:size(normv,1)],'xticklabel',{'avg. model','mult. model','affine model'});
+set(gca,'XTickLabelRotation',30);
+ylim([.0 1.0]);
+xlim([.5 size(normv,1) + .5]);
+ylabel({'variance explained'});
 axis square;
+
+% mult gain and face pred
+i=i+1;
+d=1;
+hs{i}=my_subplot(6,2,12,[.78 .62]);
+hs{i}.Position(2)=hs{i}.Position(2)-.01;
+hs{i}.Position(1)=hs{i}.Position(1)-.02;
+[ttrain,ttest]=splitInterleaved(length(multgain{d}{3}),30,0.5,1);
+mg = multgain{d}{3};
+fg = facest{d};
+mg = mg-mean(mg);
+fg = fg-mean(fg,2);
+a=(fg(:,ttrain)*fg(:,ttrain)' + 100*eye(500))\(fg(:,ttrain)*mg(ttrain));
+% x = x - mean(x);
+y = projstim{1}{4};
+y = y - mean(y);
+% z = facest{1}';
+% z = z - mean(z,1);
+as = (y(ttrain)'*y(ttrain))\(y(ttrain)'*mg(ttrain));
+% a2 = (z'*z + 300*eye(size(z,2)))\(z'*x);
+hold all;
+ttest = find(ttest);
+tstim=300:800;
+r = corr(y(ttest),mg(ttest));
+plot(mg(ttest(tstim)),'r','linewidth',1)
+plot(y(ttest(tstim))*as,'color',.6*[1 1 1],'linewidth',1);
+plot(fg(:,ttest(tstim))'*a,'b','linewidth',0.5)
+text(0,1.15,'gain','color','r','fontangle','normal','fontsize',8);
+text(.25,1.15,sprintf('face prediction of gain, r=%1.2f',facegain_r2(1)),'color','b','fontangle','normal','fontsize',8);
+text(.3,0.1,sprintf('stim-behav shared dim, r=%1.2f',r),'color',.4*[1 1 1],'fontangle','normal','fontsize',8);
+box off;
+axis tight;
+axis off;
+plot([0 60/1.2],[1 1]*-110,'k','linewidth',2)
+text(0,-.02,'1 min','fontangle','normal','fontsize',8);
+
+
+%normv(2:3,:) = squeeze(fitmult(:,id(k),:)) .* normv(4,:);
+
 
 tstr{1} = 'Behavior and neural activity with/without visual stimulation';
 tstr{2} = 'Variance of face PCs';
-tstr{3} = 'Stim-face shared dims';
+tstr{3} = {'Stim-behav shared','         subspace'};
 tstr{4} = 'Top dimension';
 tstr{5} = '';
 tstr{6} = 'Projections of neural activity';
@@ -302,16 +345,22 @@ hp=.05;
 hy=1.22;
 deffont=8;
 for j = [1:length(hs)]
-    if j ==1 || j==6
+    if j ==1
         hp0 =.04;
         hy0 = 1.06;
+	elseif j==6
+		hp0 =.04;
+        hy0 = 1.03;
     elseif j==5 
         hy0=.95;
         hp0 = -0.08;
-    elseif j>6
+    elseif j==9
+		hy0=1.2;
+		hp0=.03;
+	elseif j>6
         hy0=hy;
         hp0=.03;
-    else
+	else
         hp0=hp;
         hy0 = hy;
     end
@@ -327,10 +376,24 @@ for j = [1:length(hs)]
     axis([0 1 0 1]);
     axis off;
 end
+%%
+print(fullfile(matroot, 'fig4new.pdf'),'-dpdf');
 
 
 %% plots of variance as a function of dimension
+clf;
+cm=[0 0 1; 0 .5 .5; 1 0 .5; .5 .5 .5];
+for k=1:4
+	plot(squeeze(vsigstimspont(3,k,:)),squeeze(vsigstimspont(2,k,:)),'o','color',cm(k,:))
+	hold all;
+end
+hold all;
+plot([25 5e3],[25 5e3],'k')
+xlabel('spont periods');
+ylabel('stim periods');
+axis tight;
 
+%%
 % dx = .7;
 % dy = .65;
 % i=i+1;

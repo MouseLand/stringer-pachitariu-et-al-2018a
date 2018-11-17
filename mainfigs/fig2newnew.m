@@ -113,35 +113,6 @@ x1 = hs{3}.Position(1);
 y0 = hs{3}.Position(2) + hs{3}.Position(4)/2;
 annotation('arrow',[x0 x1],[y0 y0]);
 
-
-
-% % ------------ PC VAR EXP ------------%
-% i=i+1;
-% hs{i} = my_subplot(5,4,5,[.65 .65]);
-% hs{i}.Position(1) = hs{i}.Position(1) + .06;
-% hs{i}.Position(2) = hs{i}.Position(2)+.01;
-% for d = 1:ndat
-% 	semilogx([1:1024],(cov_neur(:,d)-squeeze(cov_res_beh(:,6,d,9)))./var_neur(:,d),'color',cdat(d,:))
-% 	hold all;
-% end
-% semilogx([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,2),'k','linewidth',2);
-% %semilogx([1:128],mean(expvPC(1:128,:),2),'color',.6*[1 1 1],'linewidth',2);
-% %semilogx([1:128],mean(squeeze(expvPC_behavior(1:end-1,3,:,7)),2),'k-.','linewidth',1);
-% %axis([0 .06 0 .06]);
-% set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1])
-% ylabel({'variance explained','(test set)'});
-% %text(.6,1,{'max','explainable'},'color',.6*[1 1 1],'fontsize',8)
-% xlabel('PC dimension');
-% box off;
-% axis square;
-% axis tight;
-% ylim([0 1]);
-% xlim([0 128]);
-% grid on;
-% grid minor;
-% grid minor;
-
-
 % ---------- SCHEMATIC ------------------%
 i=i+1;
 hs{i} = my_subplot(4,5,6,[1 .6]);
@@ -167,9 +138,10 @@ h2.Position(1) = h2.Position(1) +.04;
 h2.Position(2) = hs{i}.Position(2) + .0;
 hold all;
 cp = .4*[1 1 1];
+ipc = [1 3 4 5];
 for j = 1:nPCs
-    xp=vtest{dex}(j,trange);
-    pred=vpred{dex}(j,trange);
+    xp=vtest{dex}(ipc(j),trange);
+    pred=vpred{dex}(ipc(j),trange);
     pred = pred / std(xp);
     xp = xp / std(xp);
 	ssk = sign(skewness(xp));
@@ -178,8 +150,8 @@ for j = 1:nPCs
     r = corr(vtest{dex}(j,:)',vpred{dex}(j,:)');
     plot(NT*3+[1:NT],+xp-j*8, 'color', cpc(j,:));
     plot(NT*3+[1:NT],pred-j*8, 'color', cp);
-    text(NT*3.6,-j*8+8,sprintf('r^2=%1.2f',r^2),'units','data','fontsize',8,...
-        'fontweight','bold','color',cpc(j,:));
+    %text(NT*3.6,-j*8+8,sprintf('r^2=%1.2f',r^2),'units','data','fontsize',8,...
+    %    'fontweight','bold','color',cpc(j,:));
 end
 axis tight;
 axis off;
@@ -242,51 +214,45 @@ grid minor;
 
 
 % ------------ RASTERS
-trange = 200+[1:300];%[800:1300];
+trange = 190+[1:350];%[800:1300];
 %trange = [trange(5:end-13) 830+[1:45]];% 1200+[1:50]];
 i=i+1;
 hs{i}=my_subplot(4,2,5,[.85 .8]);
 hs{i}.Position(2) = hs{i}.Position(2) +.01; 
-%hs{i}.Position(1) = .37;
-%hs{i}.Position(3) = .6;
-%hs{i}.Position(2) = hs{i-2}.Position(2)-.02;
-%hs{i}.Position(1) = hs{4}.Position(1);
-%hs{i}.Position(2) = hs{i}.Position(2) + .025;
-%hs{i}.Position(4) = .22;
-yt = ytest{dex}(isortembed{dex},trange);
+yt = ytest{dex}(isortembed{dex}(end:-1:1),trange);
 ytstd = max(1e-3,std(yt,1,2));
 yt = yt ./ ytstd;
-imagesc(my_conv2(yt, 2, 1),[0 .8])
+imagesc(my_conv2(yt, 6, 1),[0 .3])
 colormap(hs{i},flipud(cgray));
 axis off;
 text(0,1.15,'Neural activity (test set) sorted by 1D embedding','fontangle','normal','fontsize',8);
 NN=size(yt,1);
 hold all;
-plot([0 10/1.2], (NN+100)*[1 1],'k');
-plot([0 0]-0, NN+[0 -1000],'k');
-ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
+plot([-2 10/1.2], (NN+100)*[1 1],'k');
+plot([0 0]-2, NN+[0 -1000],'k');
+ht=text(-.06,0,'1000 neurons','fontsize',8,'fontangle','normal');
 ht.Rotation=90;
 text(0,0,'10 s','fontsize',8,'fontangle','normal');
 axis tight;
 
-hp=my_subplot(4,2,6,[.85 .8]);
+hp=my_subplot(4,2,7,[.85 .8]);
 %hp.Position(1) = hs{i}.Position(1);
 %hp.Position(3) = hs{i}.Position(3);
 %hp.Position(1) = hs{4}.Position(1);
-hp.Position(2) = hs{i}.Position(2);
+hp.Position(1) = hs{i}.Position(1);
 %hp.Position(4) = .22;
-yp = ypred{dex}(isortembed{dex},trange);
+yp = ypred{dex}(isortembed{dex}(end:-1:1),trange);
 yp = yp ./ ytstd; % scale prediction by same amount
-yp = my_conv2(yp, 1, 1);
-imagesc(yp,[0 .8])
+yp = my_conv2(yp, 0.5, 1);
+imagesc(yp,[0 .3])
 colormap(hp,flipud(cgray));
 axis off;
 text(0,1.15,'Neural activity prediction (test set) from faces','fontangle','normal','fontsize',8);
-ht=text(-.04,0,'1000 neurons','fontsize',8,'fontangle','normal');
+ht=text(-.06,0,'1000 neurons','fontsize',8,'fontangle','normal');
 ht.Rotation=90;
 hold all;
-plot([0 10/1.2], (NN+100)*[1 1],'k');
-plot([0 0]-0, NN+[0 -1000],'k');
+plot([-2 10/1.2], (NN+100)*[1 1],'k');
+plot([0 0]-2, NN+[0 -1000],'k');
 text(0,0,'10 s','fontsize',8,'fontangle','normal');
 axis tight;
 
@@ -296,9 +262,9 @@ yh=.55;
 
 % --------------------- DIMS VS VAR EXP -------------- %
 i=i+1;
-hs{i} = my_subplot(4,4,13,[xh yh]);
-hs{i}.Position(1) = hs{i}.Position(1) + .04;
-%hs{i}.Position(2) = hs{i}.Position(2)+.0;
+hs{i} = my_subplot(4,4,11,[xh yh]);
+hs{i}.Position(1) = hs{i}.Position(1) + .025;
+hs{i}.Position(2) = hs{i}.Position(2)+.01;
 %hs{i}.Position(2) = hs{i-1}.Position(2);
 expcbeh = cumsum(cov_neur - permute(squeeze(cov_res_beh(:,:,:,9)),[1 3 2]))./cumsum(var_neur);
 expcbeh = squeeze(expcbeh(128,:,:))';
@@ -326,8 +292,8 @@ title('PC 1-128','fontweight','normal');
 
 %-------------- PEER PRED -----------------%
 i=i+1;
-hs{i}=my_subplot(4,4,14,[xh yh]);
-hs{i}.Position(1) = hs{i}.Position(1)+.025;
+hs{i}=my_subplot(4,4,12,[xh yh]);
+hs{i}.Position(2) = hs{i-1}.Position(2);
 expcbeh = cumsum(cov_neur - squeeze(cov_res_beh(:,6,:,9)))./cumsum(var_neur);
 expccum = cumsum(cov_neur)./cumsum(var_neur);
 ev = [expccum(128,:)' expcbeh(128,:)'];
@@ -372,20 +338,30 @@ grid minor;
 grid minor;
 title('PC 1-128','fontweight','normal');
 
+% ---------- TIMELAG --------%
 i=i+1;
 hs{i} = my_subplot(4,4,16,[xh yh]);
-xlabel('timelag analysis')
+evtlag = cumsum(tlag_cov_neur - tlag_cov_res_beh)./...
+	cumsum(tlag_var_beh);
+hold all;
+for d = 1:ndat
+	plot(tdelay,evtlag(128,:,d),'color',cdat(d,:),'linewidth',0.5)
+end
+plot(tdelay,mean(evtlag(128,:,:),3),'b','linewidth',2);
+%axis tight;
+xlabel('time from behavior (s)');
+ylabel({'variance explained'});
 title('PC 1-128','fontweight','normal');
 
 
 % -------------- LETTERS
 hp=.065;
-hy=1.25;
+hy=1.3;
 deffont=8;
 for j = [1:length(hs)]
 	if j== 5
     	hp0=.11;
-		hy0=hy;
+		hy0=1.2;
     elseif j==4
         hp0 =0.03;
         hy0 = 1.3;
@@ -401,6 +377,9 @@ for j = [1:length(hs)]
     elseif j==7
         hp0=.1;
         hy0=hy;
+	elseif j==length(hs)
+		hp0 = .07;
+		hy0 = hy;
 	else
         hp0=hp;
         hy0 = hy;
@@ -412,20 +391,18 @@ for j = [1:length(hs)]
     axis off;
 end
 
-tl=squeeze(mean(expv_tlag(6,:,:),2));
+tl=squeeze(evtlag(128,:,:));
 
-tli = interp1(tlag,tl,[-8:.01:8]);
+tli = interp1(tdelay,tl,[-8:.01:8]);
 
-[~,ix1]=min(abs(max(tli)/2 - tli(1:800)));
-[~,ix2]=min(abs(max(tli)/2 - tli(801:end)));
+[~,ix1]=min(abs(max(tli,[],1)/2 - tli(1:800,:)));
+[~,ix2]=min(abs(max(tli,[],1)/2 - tli(801:end,:)));
 
 fwhm = (800-ix1+ix2)*.01
 
 %%
 print(fullfile(matroot,'fig2new.pdf'),'-dpdf');
 %%
-
-% ---------- TIMELAG --------%
 i=i+1;
 hs{i} = my_subplot(5,4,20,[xh yh]);
 tlag = tdelay*.4;
@@ -434,9 +411,6 @@ for j = 1:ndat
     hold all;
 end
 plot(tlag,squeeze(mean(expv_tlag(6,:,:),2)),'k','linewidth',2);
-axis tight;
-xlabel('time from behavior (s)');
-ylabel({'variance explained'});
 %axis([-7*1.2 10 0 13])
 ylim([0 .15]);
 box off;

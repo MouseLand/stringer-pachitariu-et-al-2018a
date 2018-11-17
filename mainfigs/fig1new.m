@@ -44,7 +44,7 @@ i=i+1;
 hs{i}=my_subplot(5,5,1,[xh yh]);
 axis off;
 hp=hs{i}.Position;
-axes('position',[hp(1)-.05 hp(2)-.05 1.4*hp(3:4)]);
+axes('position',[hp(1)-.05 hp(2)-.03 1.4*hp(3:4)]);
 im = imread('planes.PNG');
 imagesc(im);
 axis off;
@@ -54,7 +54,7 @@ i=i+1;
 hs{i}=my_subplot(5,5,2,[xh yh]);
 axis off;
 hp=hs{i}.Position;
-axes('position',[hp(1)-.05 hp(2)-.05 1.4*hp(3:4)]);
+axes('position',[hp(1)-.05 hp(2)-.03 1.4*hp(3:4)]);
 im = imread('explane.PNG');
 imagesc(im);
 title('plane 5/11','fontweight','normal','fontsize',8);
@@ -74,8 +74,8 @@ hold all;
 nb = histcounts(pc.results.ccall(1:1:end),bins);
 %nb = nb/sum(nb);
 plot(pbins,log10(nb),'color',cdat(dex,:))
-text(.5,.75,'shuffled','fontangle','normal','fontsize',8,'color',.5*[1 1 1],'fontweight','bold');
-text(.5,.88,'original','fontangle','normal','fontsize',8,'color',cdat(dex,:),'fontweight','bold');
+text(.4,.65,'shuffled','fontangle','normal','fontsize',8,'color',.5*[1 1 1]);%,'fontweight','bold');
+text(.55,.85,'original','fontangle','normal','fontsize',8,'color',cdat(dex,:));%,'fontweight','bold');
 axis tight;
 %ylim([-16 -3]);
 xlim([-.25 .7]);
@@ -102,8 +102,8 @@ plot([y1(j) y2(j)],hi*[1 1],'k');
 plot(y1(j)*[1 1],[hi-.02 hi],'k');
 plot(y2(j)*[1 1],[hi-.02 hi],'k');
 end
-text(0.02,1.26,{' gray','screen'},'fontsize',7,'fontangle','normal')
-text(0.45,1.11,{'darkness'},'fontsize',7,'fontangle','normal')
+text(0.02,1.3,{' gray','screen'},'fontsize',7,'fontangle','normal')
+text(0.45,1.15,{'darkness'},'fontsize',7,'fontangle','normal')
 ylabel('correlation');
 xlabel('recordings');
 set(gca,'xtick',[]);
@@ -113,7 +113,6 @@ ylim([-.05 .25]);
 
 pcs = pc.results.firstpcs(:,:);
 pcs = zscore(pcs.*sign(skewness(pcs)),1,1);
-pcs = pcs - min(pcs,[],1);
 behall = zscore(pc.results.behavior(:,:));
 behall(:,3) = behall(:,3)*-1;
 behall = behall - min(behall,[],1);
@@ -125,7 +124,7 @@ hs{i} = my_subplot(5,5,5,[xh yh]);
 %hs{i}.Position(2) = hs{i}.Position(2)+0.05;
 hold all; 
 plot(pcs(:,1),behall(:,1),'.','color',cdat(dex,:),'markersize',4);
-xlabel('PC magnitude');
+xlabel('PC timecourse');
 ylabel({'running','speed (a.u.)'});
 axis square;
 axis tight;
@@ -136,13 +135,15 @@ ylim([0 7]);
 behall = min(5,behall);
 
 % --------- PC img ------------------ %
+mpcs = min(pcs,[],1);
+%pcs = pcs - mpcs;
 i = i+1;
 x0 = .26;
 y0 = .76;
 xh0 = .7;
 yh0 = .24;
 hs{i} = my_subplot(5,1,2,[.92 .8]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)-0.1;
+hs{i}.Position(2)=hs{i}.Position(2)-0.08;
 hs{i}.Position(1)=hs{i}.Position(1);
 %hs{i}.Position(1)=hs{i-4}.Position(1);
 pos=hs{i}.Position;
@@ -168,21 +169,21 @@ tstr = {'running','pupil area','whisking'};
 for j = 1:3
 	beh = behall(trange(1:length(trange)/3),j);
 	plot(beh,'linewidth',1,'color',cm(j,:),'linewidth',1);
-	text(.0,1.1-(j-1)*0.18,tstr{j},'fontangle','normal','fontsize',8,'color',cm(j,:));
+	text(.03,1.1-(j-1)*0.18,tstr{j},'fontangle','normal','fontsize',8,'color',cm(j,:));
 		%'fontweight','bold');
 end
 plot(pcs(trange(1:length(trange)/3),1),'-.','color',cpc(1,:),'linewidth',0.5);
-text(.2,1,'PC 1','HorizontalAlignment','right','fontangle','normal','color',cpc(1,:),'fontsize',8)
+text(.22,.84,'PC 1','HorizontalAlignment','right','fontangle','normal','color',cpc(1,:),'fontsize',8)
 text(0,-.05,'  10 s','fontangle','normal','fontsize',8);
-plot([0 10/1.2],-.3*[1 1],'k','LineWidth',2);
+plot([0 10/1.2],-1.5*[1 1],'k','LineWidth',2);
 axis tight;
-axis off;
+set(gca,'XColor','w');
 xlim([-5/3 length(trange)/3]);
 
 % ---------- CLUST img ------------- %
 i=i+1;
 hs{i} = my_subplot(5,1,3,[1 0.9]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)-.06;
+hs{i}.Position(2)=hs{i}.Position(2)-.04;
 hs{i}.Position(1) = hs{i-1}.Position(1);
 hs{i}.Position(4) = hs{i-1}.Position(4);
 hs{i}.Position(3) = hs{i-1}.Position(3);
@@ -202,7 +203,7 @@ axis tight;
 i=i+1;
 hs{i}=my_subplot(5,3,10,[.83 .83]);
 hs{i}.Position(1) = hs{i}.Position(1)-.03;
-hs{i}.Position(2) = hs{i}.Position(2)-.05;
+hs{i}.Position(2) = hs{i}.Position(2)-.03;
 im = imread('cov_schematic2.png');
 image(im);
 axis off;
@@ -212,7 +213,7 @@ axis image;
 i=i+1;
 hs{i}=my_subplot(5,3,11,[.65 .7]);
 hs{i}.Position(1) = hs{i}.Position(1)-.05;
-hs{i}.Position(2) = hs{i}.Position(2)-.06;
+hs{i}.Position(2) = hs{i}.Position(2)-.04;
 v2 = exampleV2 - mean(exampleV1,2);
 v1 = exampleV1 - mean(exampleV1,2);
 v2 = v2 ./ std(exampleV1(:,:),1,2);
@@ -273,14 +274,14 @@ end
 
 % ----- PEER PRED PC ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,21,[xh yh]);
+hs{i}=my_subplot(5,4,22-5,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
 hs{i}.Position(1)=hs{i}.Position(1)+.025;
 for d = 1:ndat
-    semilogx(cov_neur(:,d)./var_neur(:,d),'color',cdat(d,:),'linewidth',0.5);
+    semilogx(cov_neur(:,d)./var_neur(:,d) * 100,'color',cdat(d,:),'linewidth',0.5);
     hold all;
 end
-semilogx(mean(cov_neur./var_neur,2),'color',.8*[1 1 1],'linewidth',2);
+semilogx(mean(cov_neur./var_neur,2) * 100,'color',.8*[1 1 1],'linewidth',2);
 %expccum = cumsum(nanmean(cov_neur,2))./cumsum(nanmean(var_neur,2));
 %semilogx(expccum,'k','LineWidth',2);
 %text(0.2,1.15,'cumulative','FontSize',8);
@@ -288,15 +289,15 @@ text(0.05,0.25,'mean','FontSize',8,'color',.6*[1 1 1]);
 box off;
 axis square;
 xlabel('PC dimension');
-ylabel({'variance','explained'});
+ylabel({'% reliable variance     '});
 %title({'explainable','variance'},'fontweight','normal')
-set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
+set(gca,'xtick',10.^[0:3],'ytick',[0:20:100]);
 axis tight;
-ylim([0 1]);
+ylim([0 100]);
 
 % ----- power-law ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,22,[xh yh]);
+hs{i}=my_subplot(5,4,23-5,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
 hs{i}.Position(1)=hs{i}.Position(1)+.02;
 for d = 1:ndat
@@ -307,7 +308,7 @@ loglog(nanmean(cov_neur,2)/sum(nanmean(cov_neur,2)),'k','linewidth',1)
 box off;
 axis square;
 xlabel('PC dimension');
-ylabel({'reliable','variance'});
+ylabel({'reliable variance   '});
 set(gca,'xtick',10.^[0:3],'ytick',10.^[-4:2:10]);
 axis tight;
 ylim([1e-5 1]);
@@ -317,49 +318,50 @@ grid minor;
 grid minor;
 
 % ----- PEER PRED PC ---------%
-i=i+1;
-hs{i}=my_subplot(5,5,23,[xh yh]);
-hs{i}.Position(2)=hs{i}.Position(2)-.02;
-hs{i}.Position(1)=hs{i}.Position(1)+.01;
-for d = 1:ndat
-    semilogx(cumsum(cov_neur(:,d))./sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5);
-    hold all;
-end
-semilogx(mean(cumsum(cov_neur)./sum(cov_neur),2),'k','linewidth',2);
-box off;
-axis square;
-xlabel('PC dimension');
-ylabel({'reliable','variance'});
-title({'cumulative'},'fontweight','normal')
-set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
-axis tight;
-ylim([0 1]);
+% i=i+1;
+% hs{i}=my_subplot(5,5,23,[xh yh]);
+% hs{i}.Position(2)=hs{i}.Position(2)-.02;
+% hs{i}.Position(1)=hs{i}.Position(1)+.01;
+% for d = 1:ndat
+%     semilogx(cumsum(cov_neur(:,d))./sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5);
+%     hold all;
+% end
+% semilogx(mean(cumsum(cov_neur)./sum(cov_neur),2),'k','linewidth',2);
+% box off;
+% axis square;
+% xlabel('PC dimension');
+% ylabel({'reliable variance'});
+% title({'cumulative'},'fontweight','normal')
+% set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
+% axis tight;
+% ylim([0 1]);
 
 % ----- PC By PC VAR EXP ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,24,[xh yh]);
+hs{i}=my_subplot(5,4,24-5,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
 hs{i}.Position(1)=hs{i}.Position(1)+.01;
 cm(4,:) = [0 0 0];
 idim = [1 1 1 3];
 ij = [1:3 7];
 for j=1:4
-    semilogx((nanmean(cov_neur,2) - nanmean(cov_res_beh(:,idim(j),:,ij(j)),3))./nanmean(var_neur,2),'color',cm(j,:),'linewidth',0.5);
+    semilogx(100*(nanmean(cov_neur,2) - nanmean(cov_res_beh(:,idim(j),:,ij(j)),3))./nanmean(var_neur,2),'color',cm(j,:),'linewidth',0.5);
     hold all;
 end
-semilogx(mean(cov_neur./var_neur,2),'color',.8*[1 1 1],'linewidth',2);
+semilogx(100*mean(cov_neur./var_neur,2),'color',.8*[1 1 1],'linewidth',2);
 box off;
 axis square;
 xlabel('PC dimension');
-ylabel({'variance','explained'});
-set(gca,'xtick',10.^[0:3],'ytick',[0:.2:1]);
+%ylabel({'variance','explained'});
+ylabel({'% reliable variance     '});
+set(gca,'xtick',10.^[0:3],'ytick',[0:20:100]);
 axis tight;
-axis([0 1024 0 1]);
+axis([0 1024 0 100]);
 
 
 % ----- PC By PC VAR EXP ---------%
 i=i+1;
-hs{i}=my_subplot(5,5,25,[xh yh]);
+hs{i}=my_subplot(5,4,25-5,[xh yh]);
 hs{i}.Position(2)=hs{i}.Position(2)-.02;
 hs{i}.Position(1)=hs{i}.Position(1)+.01;
 cm(4,:) = [0 0 0];
@@ -371,22 +373,24 @@ for j=1:4
 	exbeh(j,:) = exb(128,:);
 end
 for d= 1:ndat
-	plot(exbeh(:,d),'color',cdat(d,:));
+	plot(100* exbeh(:,d),'color',cdat(d,:));
 	hold all;
 end
-plot(nanmean(exbeh,2),'k','linewidth',2);
+plot(100*nanmean(exbeh,2),'k','linewidth',2);
 %expccum = cumsum(nanmean(cov_neur,2))./cumsum(nanmean(var_neur,2));
 %plot(ones(4,1)*expccum(128),'color',.8*[1 1 1])
 box off;
 axis square;
-ylabel({'variance','explained'});
+ylabel({'% reliable variance     '});
+%ylabel({'variance','explained'});
 grid on;
 grid minor;
 grid minor;
-set(gca,'xtick',[1:4],'ytick',[0:.05:1],'xticklabel',...
+set(gca,'xtick',[1:4],'ytick',[0:5:15],'xticklabel',...
 	{'\color[rgb]{.2,.8,.2} run','\color[rgb]{.5,.6,.5} pupil','\color[rgb]{.1,.9,.6}whisk','all 3'});
 set(gca,'XTickLabelRotation',45)
 axis tight;
+ylim([0 15])
 title('PC 1-128','fontweight','normal');
 % %
 % for j = [1 2 3]
@@ -417,13 +421,16 @@ for t = 2:30
 end
 
 % -------------- LETTERS
-hp=.05;
+hp=.08;
 hy=1.32;
 deffont=8;
 for j = [1:length(hs)]
+	hp0=hp; hy0=hy;
     if j==6
         hp0 =0.04;
         hy0 = 1.7;
+	elseif j==1
+		hp0 = .06;
 	elseif j==7
 		hy0 = 1.;
 	elseif j==8
@@ -436,7 +443,7 @@ for j = [1:length(hs)]
 		hp0=0.04;
 		hy0=hy;		
 	elseif j>10
-		hp0=.08;
+		hp0=.09;
 		hy0=1.25;
     else
         hp0=hp;

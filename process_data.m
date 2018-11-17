@@ -32,7 +32,7 @@ pcAnalysis(dataroot,matroot, useGPU, dex);
 smooth1Dclusters(dataroot,matroot,useGPU, dex);
 
 %% predict PCs from each other
-peerPC_CCA(dataroot, matroot, useGPU, dex);
+peerPC_cov(dataroot, matroot, useGPU, dex);
 
 %% peer prediction for neurons is pretty slow (different peers for each neuron)
 % (I've put the mat file in the folder if you want to use it 'PCApred.mat')
