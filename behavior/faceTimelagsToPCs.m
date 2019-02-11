@@ -1,4 +1,4 @@
-function faceTimelags(dataroot,matroot,useGPU)
+function faceTimelagsToPCs(dataroot,matroot,useGPU)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 

@@ -1,4 +1,4 @@
-function results = predictPCsFromAllBeh(dataroot, matroot, useGPU, dex)
+function results = predictPCsFromAllBeh(dataroot, matroot, useGPU)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 

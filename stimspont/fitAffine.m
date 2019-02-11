@@ -1,4 +1,4 @@
-function [varexp, gain, Rfit] = fitAffine(R, istims, estimate_additive)
+function [varexp, gain, Rfit,sm] = fitAffine(R, istims, estimate_additive)
 
 %% fit affine model to stimulus dims
 %R = R ./ sqrt(sum(R.^2,2));

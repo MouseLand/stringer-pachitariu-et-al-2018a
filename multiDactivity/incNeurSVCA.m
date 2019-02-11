@@ -1,16 +1,20 @@
-function peerPCvar(dataroot,matroot,useGPU)
-
-nPC = 2.^[0:10];
-ndim0 =  1:512;
+function incNeurSVCA(dataroot,matroot,useGPU,dex)
 
 dall=load(fullfile(dataroot, 'dbspont.mat'));
 
+nneur0 = 2.^[8:12];
+npc = 1024;
+
 clf;
-%hold all;
-lambda = 10; % regularizer
+%%
+
+cov_neur = NaN*zeros(npc, length(nneur0), 10, length(dall.db));
+var_neur = NaN*zeros(npc, length(nneur0), 10, length(dall.db));
+nneurs = [];
+
+rng('default');
 
 %%
-rng('default');
 for d = [1:length(dall.db)]
     %%
     dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
@@ -42,10 +46,6 @@ for d = [1:length(dall.db)]
     nt = size(ytest,2);
     ntest = find(sum(repmat(y,1,nt) == ytest, 2)>0);
     
-    %ntrain = randperm(NN);
-    %ntest = ntrain(1:floor(NN/2));
-    %ntrain = ntrain(floor(NN/2)+1:end);
-    
     %% bin spikes in 1.2 second bins
     if dat.db.nplanes==10
         tbin = 4;
@@ -57,7 +57,8 @@ for d = [1:length(dall.db)]
         NN, tbin, []),2));
     Ff = (Ff - mean(Ff,2));
     NT = size(Ff,2);
-    %% divide time in half
+    
+	%% divide time in half
     %Ff = randn(size(Ff));
     Lblock = 60;
     fractrain = 0.5;
@@ -65,40 +66,34 @@ for d = [1:length(dall.db)]
     tic;
     if useGPU
         Ff = gpuArray(single(Ff));
-    end
-    [utrain,~,~] = Ff(:,itrain);
+	end
     
-    %%
-    vtest1 = utrain(ntrain,1:1024)' * Ff(ntrain,itrain);
-    vtest2 = utrain(ntest,1:1024)' * Ff(ntest,itrain);
-    
-    semilogx(diag(corr(vtest1',vtest2')));
-    
-    %%
-    pctrain = 1:512;
-    expvPC=[];
-    for j = nPC
-        [a, b] = CanonCor2(vtest(itrain,1:j), vtrain(itrain,pctrain),1e-4);
-        for k = 1:length(ndim0)
-            n=ndim0(k);
-            if n<=size(b,2)
-                
-                vpred    = vtrain(itest,pctrain) *  b(:,1:n) * a(:,1:n)';
-                
-                % residuals of PCs
-                vres   = vtest(itest,1:j) - vpred;
-                expvPC(k,j) = 1 - nanmean(nanvar(vres,1,1))/nanmean(nanvar(vtest(itest,1:j),1,1));
-            end
-        end
-    end
-        
-    clf; 
-    plot(expvPC)
-    max(expvPC(:))
+	nneur1 = nneur0;
+	nmax = min(length(ntest),length(ntrain));
+	if nmax < nneur1(end)
+		nneur1(end) = nmax;
+	end
+	
+	for n = 1:length(nneur1)
+		% do multiple subsets and avg
+		for it = 1:10
+			ntrain1 = ntrain(randperm(length(ntrain), nneur1(n)));
+			ntest1 = ntest(randperm(length(ntest), nneur1(n)));
+			[sneur, varneur, u, v] = SVCA(Ff, min(npc, nneur1(n)), ntrain1, ntest1,	itrain, itest);
+			cov_neur(1:length(sneur),n,it,d) = gather_try(sneur);
+			var_neur(1:length(sneur),n,it,d) = gather_try(varneur);
+		
+		end
+		semilogx(cov_neur(:,n,it,d)./var_neur(:,n,it,d))
+		
+		ylim([0 1]);
+		hold all;
+		drawnow;
+		
+	end
+	nneurs(:,d) = nneur1;
 end
 
+%%
 
-%save(fullfile(matroot,'PCApred.mat'),'results','expv_neurons');
-
-
-
+save(fullfile(matroot,'incNeurSVCA.mat'),'cov_neur','var_neur','nneurs');

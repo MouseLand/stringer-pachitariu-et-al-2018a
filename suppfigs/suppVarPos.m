@@ -1,4 +1,6 @@
-load('expv_neurons_pos.mat');
+function suppVarPos(matroot)
+
+load(fullfile(matroot,'expv_neurons_pos.mat'));
 
 %%
 
@@ -143,4 +145,4 @@ for j = [1:length(hs)]
 end
 
 %
-print('../figs/suppVarV1.pdf','-dpdf','-bestfit');
+print(fullfile(matroot,'suppVarV1.pdf'),'-dpdf','-bestfit');

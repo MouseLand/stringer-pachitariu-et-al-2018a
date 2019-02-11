@@ -1,3 +1,8 @@
+function supppcs(matroot)
+
+load(fullfile(matroot,'corr1stpc.mat'));
+
+%%
 close all;
 default_figure([10 10 6 6]);
 %%
@@ -22,4 +27,4 @@ for d = 1:ndat
 end
 
 %%
-print('../figs/suppPCAC.pdf','-dpdf','-bestfit');
+print(fullfile(matroot,'suppPCAC.pdf'),'-dpdf','-bestfit');

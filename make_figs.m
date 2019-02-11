@@ -8,14 +8,46 @@ matroot  = '/media/carsen/DATA2/grive/10krecordings/spontResults/';
 
 close all;
 
-fig1(matroot);
+%% fig1: 1st PC and SVCA
+fig1new(matroot);
 
-fig2(matroot);
+%% fig2: multi-dimensional behavior prediction in V1
+fig2new(matroot);
 
-fig3(matroot);
-
-fig4(matroot);
-
-fig6(matroot);
+%% fig4: stim-spont comparison in V1
+fig4new(matroot);
 
 %% supplementary figures
+
+% increasing neurons and bin size fig
+suppIncNeuronsBins(matroot);
+
+% drifting grating stim-spont
+suppOriStimSpont(matroot);
+
+% all the face embeddings
+suppFacePreds(matroot);
+
+% single neuron predictions
+suppPeerNeurons(matroot);
+
+% 1D behavioral variables correlations
+supp1DBeh(matroot);
+
+% PC autocorrelation functions
+supppcs(matroot);
+
+% distances between neurons vs correlations
+suppDists(matroot);
+
+% repeatability of correlations (1st half, 2nd half)
+suppCorrStats(matroot);
+
+% explainability by behavior vs position
+suppVarPos(matroot);
+
+% stim-spont variances
+suppStimEmbed(matroot);
+
+
+

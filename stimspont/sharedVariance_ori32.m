@@ -1,18 +1,24 @@
-function results = sharedVariance(dataroot, matroot, useGPU)
+function results = sharedVariance_ori32(dataroot, matroot, useGPU)
 
-load(fullfile(dataroot,'dbstimspont.mat'));
+%%
+
+load(fullfile(dataroot,'dbori32.mat'));
+% first orientation dataset doesn't have spont periods
+dbs = dbs(2:end);
 
 clear results;
 %
 rng('default');
 
 %%
-lam = [8 .5 1 8];
+lam = [.05 1 0.5 0.1];
 
+%%
 for d = 1:length(dbs)
+	
     db = dbs(d);
     dat = load(fullfile(dataroot,...
-        sprintf('stimspont_%s_%s.mat',db.mouse_name,db.date)));
+        sprintf('orispont_%s_%s.mat',db.mouse_name,db.date)));
     
     %
     if isfield(dat.stat, 'redcell')
@@ -31,6 +37,7 @@ for d = 1:length(dbs)
     % spontaneous activity
     % ~dat.stimtpt
     x = x(~dat.stimtpt & ~tnoface,:);
+	fpc = size(x,2);
     y = dat.Fsp(gcell, ~dat.stimtpt & ~tnoface);
     
     [NN NT] = size(y);
@@ -79,11 +86,12 @@ for d = 1:length(dbs)
         [u s v] = svdecon(single(ytrain));
     end
     ncomps  = 128;
+	ncomps  = min(ncomps,size(u,2));
     u       = gather_try(u(:, 1:ncomps));
 	v       = gather_try(v(:, 1:ncomps)*s(1:ncomps,1:ncomps));
     
 	%
-	uSpont = normc(u(:,1:128));
+	uSpont = normc(u(:,1:min(ncomps,size(u,2))));
 	%
 	[a, b] = CanonCor2(ytrain', xtrain', lam(d));
     % face vectors
@@ -91,16 +99,16 @@ for d = 1:length(dbs)
 	ypred = a(:,1:32)*b(:,1:32)'*xtest;
 	fprintf('face pred: %2.3f\n',1-mean(sum((ypred-ytest).^2,2))/mean(sum(ytest.^2,2)));
     
-    
     % compute face PCs in stimulus bins
 	xst = dat.beh.face.motionSVD_stim;
     xst = xst'; 
 	xst = xst - nanmean(xst,1);
 	xst = xst / nanstd(xst(:,1));
 	
+	
 	rsp = dat.beh.runSpeed_stim;
 	rsp = rsp - nanmean(rsp);
-		
+	
 	% compute stimulus vectors
     istim = dat.stim.istim(dat.stim.istim<33);
     sresp = dat.stim.resp(dat.stim.istim<33, gcell);
@@ -232,7 +240,7 @@ for d = 1:length(dbs)
 	% face-related variance in the shared subspace
     ushared = results.Ushared{d,1};
 	yt = ushared' * ytrain;
-	as = (xtrain*xtrain' + 1000*eye(500)) \ (xtrain*yt(:));
+	as = (xtrain*xtrain' + 1000*eye(fpc)) \ (xtrain*yt(:));
 	yp = xtest'*as;
 	cc = corr(yp(:), ytest' * ushared)
 	results.faceushared_r2(d) = cc;
@@ -243,8 +251,7 @@ for d = 1:length(dbs)
 	Ssub{4} = normc(ushared);
 	%%
     clf;
-    for k = 1:10
-		%%
+    for k = 1:24	
 		if k < 5
 			uproj = Ssub{k};
 		else
@@ -271,11 +278,19 @@ for d = 1:length(dbs)
 		end
         results.vsigstimspont(:,k,d) = [sum(vsignal) sum(vstim) sum(vspont) (vsnr)];
 				
-		[results.decoding(k,d),Model] =  decoder(istims, istims, yst(:,1:min(size(yst,2),32),1), yst(:,1:min(size(yst,2),32),2));
-		title(results.decoding(k,d));
+		% decode direction
+		[results.decoding(k,d,1),~] =  decoder(istims, istims, ...
+			yst(:,1:min(size(yst,2),32),1), yst(:,1:min(size(yst,2),32),2), 1);
+		
+		% decode orientation
+		istims_ori = istims;
+		istims_ori(istims_ori>16) = istims_ori(istims_ori>16) - 16;
+		[results.decoding(k,d,2),~] =  decoder(istims_ori, istims_ori, ...
+			yst(:,1:min(size(yst,2),32),1), yst(:,1:min(size(yst,2),32),2), 2);
+		
+		%results.decoding(k,d) =  decoder(istims, istims, v, v2);
+		title(results.decoding(k,d,:));
 		drawnow;
-
-		%results.decoding(k,d) = pdecode;
 	end
         
 	% projections onto stims (without subtraction)
@@ -308,7 +323,7 @@ for d = 1:length(dbs)
 	end
 	
 	%% predict the multiplicative gain with the face
-	lamg=[80 150 70 200];
+	lamg=[100 100 100 100];
 	%for rg=1:10
 	[ttrain,ttest]=splitInterleaved(length(results.multgain{d}{3}),2,0.8,1);
 	mg = results.multgain{d}{3};
@@ -316,7 +331,7 @@ for d = 1:length(dbs)
 	mg = mg-mean(mg);
 	fg = fg-mean(fg,2);
 	
-	a=(fg(:,ttrain)*fg(:,ttrain)' + lamg(d)*eye(500))\(fg(:,ttrain)*mg(ttrain));
+	a=(fg(:,ttrain)*fg(:,ttrain)' + lamg(d)*eye(fpc))\(fg(:,ttrain)*mg(ttrain));
 	
 	r2train = corr(fg(:,ttrain)'*a, mg(ttrain));
 	clf;
@@ -330,7 +345,7 @@ for d = 1:length(dbs)
 	%end
 	
     %% example dataset
-    if d == 1
+    if d == 4
         results.sstim = normc(ystim_avg');
         results.sprojF = normc(ystim_avg')' * yall;
         
@@ -357,5 +372,5 @@ end
 
 %%
 
-save(fullfile(matroot,'stimvar_with_decode.mat'),'-struct','results');
+save(fullfile(matroot,'stimvar_ori32.mat'),'-struct','results');
 

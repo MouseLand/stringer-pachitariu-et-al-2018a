@@ -1,3 +1,10 @@
+function suppFacePreds(matroot)
+
+
+load(fullfile(matroot,'expv_behavior_PC.mat'));
+
+%%
+
 close all;
 default_figure([15 1 9 9]);
 

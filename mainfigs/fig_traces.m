@@ -21,7 +21,7 @@ end
 
 
 plot(zscore(tshared)*1.4-(j+2.5)*4.5, 'linewidth',1,'color',.5*[1 1 1],'linewidth',.5);
-text(10,-(j+3)*4.5+10,{'stim-behav','shared dimension'},'fontsize',8,'color',.4*[1 1 1],...
+text(10,-(j+3)*4.5+8,{'stim-behav','shared dimension'},'fontsize',6,'color',.4*[1 1 1],...
     'units','data');
 
 ny = size(sproj,1) + 2.5;
@@ -32,7 +32,7 @@ for j = 1:size(tproj,1)
     hold all
 end
 plot(zscore(tshared2)*1.4-(ny+j+2)*4.5, 'linewidth',1,'color',.5*[1 1 1],'linewidth',.5);
-text(10,-(ny+j+2)*4.5+9,{'stim-spont','shared dimension'},'fontsize',8,'color',.4*[1 1 1],...
+text(10,-(ny+j+2)*4.5+6,{'stim-spont','shared dimension'},'fontsize',6,'color',.4*[1 1 1],...
     'units','data');
 
 ny = size(sproj,1) + size(tproj,1)+4.5;
@@ -45,14 +45,14 @@ for j = 1:size(tproj2,1)
 end
 
 
-ht=text(-.04,.8,titles{1},'horizontalalignment','center','fontsize',8,'color',[.8 .3 .8],...
+ht=text(-.04,.8,titles{1},'horizontalalignment','center','fontsize',6,'color',[.8 .3 .8],...
     'fontangle','normal');
 ht.Rotation = 90;
 
-ht=text(-.04,.42,titles{2},'color',[.4 .6 1],'horizontalalignment','center','fontsize',8,'fontangle','normal');
+ht=text(-.04,.42,titles{2},'color',[.4 .6 1],'horizontalalignment','center','fontsize',6,'fontangle','normal');
 ht.Rotation = 90;
 
-ht=text(-.04,.1,titles{3},'horizontalalignment','center','fontsize',8,'fontangle','normal');
+ht=text(-.04,.1,titles{3},'horizontalalignment','center','fontsize',6,'fontangle','normal');
 ht.Rotation = 90;
 
 

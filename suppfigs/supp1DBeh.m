@@ -1,3 +1,5 @@
+function supp1DBeh(matroot)
+
 load(fullfile(matroot,'example_behavior.mat'));
 load(fullfile(matroot,'expv_behavior_PC.mat'));
 load(fullfile(matroot,'PCpredict.mat'));

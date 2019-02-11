@@ -1,29 +1,20 @@
-clearvars -except dat;
+function predictNeuronsFromFacePositions(dataroot,matroot)
 
-%%
-load('../dbspont.mat');
+dall=load(fullfile(dataroot, 'dbspont.mat'));
 
-ndims0 = [1 2 3 4 8 16 32 64 128];
-
-clf;
-%expv_behavior = NaN*ones(length(ndims0),length(db),12);
-%%
-rng('default');
-for d = [1:length(db)]
+for d = [1:length(dall.db)]
     %%
-    dat = load(sprintf('../spont_%s_%s.mat',db(d).mouse_name,db(d).date));
-    
+    dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
     if isfield(dat.stat, 'redcell')
         Ff = dat.Fsp(~logical([dat.stat(:).redcell]),:);
         cellpos{d} = dat.med(~logical([dat.stat(:).redcell]),:);
     else
         Ff = dat.Fsp;
         cellpos{d} = dat.med;
-        Ff = Ff(sum(Ff,2)>0,:);
     end
-    cellpos{d} = dat.med(sum(Ff,2)>0,:);
+    cellpos{d} = cellpos{d}(sum(Ff,2)>0,:);
     Ff = Ff(sum(Ff,2)>0,:);
-    
+	
     %%
     tdelay = 1;
     y    = Ff(:,(tdelay+1):end);
@@ -41,9 +32,9 @@ for d = [1:length(db)]
     y = bin2d(y, tbin, 2);
     y = y - mean(y,2);
     
-    [u s v] = svdecon(gpuArray(single(y)));
+    [u s v] = svdecon(y);
     ncomps  = 128;
-    u       = gather(u(:, 1:ncomps));% * s(1:ncomps,1:ncomps));
+    u       = (u(:, 1:ncomps));% * s(1:ncomps,1:ncomps));
     v       = u' * y;
     
     NT = size(y,2);
@@ -100,34 +91,34 @@ for d = [1:length(db)]
     expv_neurons{d} = expv_neur;
     
     %% compute 1D embedding for all datasets
-    nC=30;
-    [~,isort] = sort(u(:,1));
-    [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort);
-    yt = y(isort,indtest);
-    ytstd = max(1e-3,std(yt,1,2));
-    yt = yt ./ ytstd;
-    yp = yp0(isort,:) ./ ytstd;
-    
-    yt = my_conv2(yt,6,1);
-    yp = my_conv2(yp,1,1);
-    ccembed(d) = corr(yt(:),yp(:));
-    disp(ccembed);
-    clf;
-    subplot(2,1,1);
-    imagesc(yt,[0 .25])
-    subplot(2,1,2);
-    imagesc(yp,[0 .25])
-    drawnow;
-    ypred{d} = yp0;
-    ytest{d} = y(:,indtest);
-    isortembed{d} = isort;
+%     nC=30;
+%     [~,isort] = sort(u(:,1));
+%     [iclust,isort] = embed1D(zscore(y(:,indtest),1,2),nC,isort);
+%     yt = y(isort,indtest);
+%     ytstd = max(1e-3,std(yt,1,2));
+%     yt = yt ./ ytstd;
+%     yp = yp0(isort,:) ./ ytstd;
+%     
+%     yt = my_conv2(yt,6,1);
+%     yp = my_conv2(yp,1,1);
+%     ccembed(d) = corr(yt(:),yp(:));
+%     disp(ccembed);
+%     clf;
+%     subplot(2,1,1);
+%     imagesc(yt,[0 .25])
+%     subplot(2,1,2);
+%     imagesc(yp,[0 .25])
+%     drawnow;
+%     ypred{d} = yp0;
+%     ytest{d} = y(:,indtest);
+%     isortembed{d} = isort;
     
 end
 %%
-save('expv_neurons_pos.mat','expv_neurons','cellpos');
+save(fullfile(matroot,'expv_neurons_pos.mat'),'expv_neurons','cellpos');
 
 %%
-save('allfacepreds.mat','ypred','ytest','isortembed');
+%save('allfacepreds.mat','ypred','ytest','isortembed');
 
 
 

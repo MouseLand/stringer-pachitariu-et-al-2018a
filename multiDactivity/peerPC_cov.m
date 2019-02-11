@@ -67,16 +67,11 @@ for d = [1:length(dall.db)]
     
     npc = 1024;%min(size(vtrain,2));
 	
-	[u2,~,~] = svdecon(Ff(ntrain,itrain));
-    
-	cov = Ff(ntrain,itrain) * Ff(ntest,itrain)';
-	[u,s,v] = svdecon(cov);
-	s1 = u(:,1:npc)' * Ff(ntrain,itest);
-	s2 = v(:,1:npc)' * Ff(ntest,itest);
-	sneur = sum(s1 .* s2, 2);
-	varneur = sum(s1.^2 + s2.^2,2)/2;
+	[sneur, varneur, u, v] = SVCA(Ff, npc, ntrain, ntest, itrain, itest);
+	
 	semilogx(sneur./varneur)
-		
+	
+	[u2,~,~] = svdecon(Ff(ntrain,itrain));
 	cpc = corr(gather_try(s1(1,:)'), gather_try(Ff(ntrain,itest)' * u2(:,1)));
 	disp(cpc);
 	corrPC1(d) = cpc;

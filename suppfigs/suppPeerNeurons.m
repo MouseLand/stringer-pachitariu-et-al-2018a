@@ -1,8 +1,13 @@
+function suppPeerNeurons(matroot)
+
 
 load(fullfile(matroot,'expv_behavior_neurons.mat'));
 load(fullfile(matroot,'expv_timedelay_neurons.mat'));
 load(fullfile(matroot,'PCApred.mat'));
+try
 ephys = load(fullfile(matroot,'ephys_peers.mat'));
+catch
+end
 
 %%
 close all;
@@ -55,6 +60,7 @@ i=i+1;
 hs{i} = my_subplot(3,4,2,[xh*1.3 yh*1.3]);
 hs{i}.Position(2) = hs{i}.Position(2) + .0;
 hs{i}.Position(1) = hs{i}.Position(1) + .04;
+try
 nPC = 2.^[0:9];
 [~,isort] = sort(max(ephys.expv_neurons,[],2),'descend');
 for j = 1:size(ephys.expv_neurons,1)
@@ -66,12 +72,13 @@ set(gca,'xtick',2.^[0:3:10]);
 axis([1 512 0 .45]);
 box off;
 ylabel({'variance explained','(test set)'});
-xlabel('dimensions');
+xlabel('# of PCs');
 grid on;
 grid minor;
 grid minor;
 axis square;
-
+catch
+end
 
 % ----- PEER PRED NEURONS ---------%
 i=i+1;
@@ -92,7 +99,7 @@ box off;
 axis square;
 ylim([0 .3]);
 ylabel({'variance explained'});
-xlabel({'PC dimensions'});
+xlabel({'# of PCs'});
 title('peer prediction','fontweight','normal')
 text(-2.2,1.2, {'Single neuron analyses','on two-photon data:'})
 
@@ -230,8 +237,12 @@ hy=1.23;
 deffont=8;
 for j = [1:length(hs)]
     hp0=hp;
+	hy0=hy;
+	if j==2
+		hy0 = 1.12;
+	end
     hpos = hs{j}.Position;
-    axes('position', [hpos(1)-hp0 hpos(2)+hpos(4)*hy(1) .01 .01]);
+    axes('position', [hpos(1)-hp0 hpos(2)+hpos(4)*hy0(1) .01 .01]);
     text(0,0, char(64+j),'fontsize',deffont+2,'fontweight','bold','fontangle','normal');
     axis([0 1 0 1]);
     axis off;
