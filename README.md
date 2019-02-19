@@ -18,11 +18,7 @@ Nicholas Steinmetz, Marius Pachitariu, Carsen Stringer, Matteo Carandini, Kennet
 
 Here's the two-photon data [description](dataSharing.pdf).
 
-The datasets to produce figures 1-4 are available.
-
-The script 'processData.m' processes all the data. Set useGPU=0 if you do not have a GPU.
-
-The script 'mainFigs.m' calls all figure-producing scripts. 
+The script 'processData.m' processes all the data. Set useGPU=0 if you do not have a GPU. The script 'mainFigs.m' calls all figure-producing scripts. 
 
 While this is useful for reproducing the paper, it does not easily allow building on the main analysis we do, or running these analyses on different data. Therefore, we will add separate scripts to run analyses one at at time, with the data clearly loaded at the top of the script, so you can swap yours in. 
 
