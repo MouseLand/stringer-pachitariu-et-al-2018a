@@ -1,7 +1,7 @@
 function suppStimEmbed(matroot)
 
 load(fullfile(matroot,'faceSpectrum.mat'));
-load(fullfile(matroot,'stimvar.mat'));
+load(fullfile(matroot,'stimvar_with_decode.mat'));
 load(fullfile(matroot,'stimfaceRepresentation.mat'));
 load(fullfile(matroot,'exResponses.mat'));
 

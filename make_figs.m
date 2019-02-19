@@ -14,6 +14,9 @@ fig1new(matroot);
 %% fig2: multi-dimensional behavior prediction in V1
 fig2new(matroot);
 
+%% fig3: ephys data
+fig3new(matroot);
+
 %% fig4: stim-spont comparison in V1
 fig4new(matroot);
 
@@ -49,5 +52,8 @@ suppVarPos(matroot);
 % stim-spont variances
 suppStimEmbed(matroot);
 
+% ephys time lags
+suppCCEphys(matroot);
 
-
+% ephys manifold embedding separated by area
+suppFastRasters(ephysroot, matroot)

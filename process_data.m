@@ -1,12 +1,14 @@
 clear all
 
 % you should change this to your local data paths
+% where you downloaded the 2P data
 dataroot = '/media/carsen/DATA2/grive/10krecordings/spontData';
-%dataroot = 'D:/grive/10krecordings/spontData';
 
-% give a local folder for saving intermediate data (3GB max)
+% where ephys data is
+ephysroot = '/home/carsen/dm11/data/Spikes/eightprobes/';
+
+% give a local folder for saving intermediate data (around 4-5GB)
 matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
-%matroot = 'D:/grive/10krecordings/spontResults';
 
 mkdir(matroot)
 
@@ -19,7 +21,7 @@ addpath(genpath('.'));
 % also download rastermap
 % https://github.com/MouseLand/rastermap/
 addpath('/media/carsen/DATA2/Github/rastermap/matlab/');
-%addpath('C:\Users\carse\github\rastermap\matlab');
+
 
 dex = 2; % second dataset as example dataset
 
@@ -37,6 +39,16 @@ peerPC_cov(dataroot, matroot, useGPU, dex);
 %% run behavioral analyses
 predictPCsFromAllBeh(dataroot,matroot,useGPU);
 quantifyBehavior(dataroot,matroot, dex);
+
+%% run ephys analyses *** need ephys data downloaded ***
+
+% bin spikes in 30Hz bins and align to faces
+alignFaces30Hz(ephysroot, matroot);    
+
+%%
+% run ephys analyses
+masterAnalysis(matroot);
+
 
 %% time delay analysis (panel 4K)
 % we used nseed = 10 in the paper - this will be a bit slow

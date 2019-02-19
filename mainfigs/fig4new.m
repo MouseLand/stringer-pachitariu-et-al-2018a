@@ -11,7 +11,7 @@ default_figure([1 1 7.25 7.25]);
 
 %%
 rng('default');
-ktype = 1; % spont prediction
+ktype = 1; % behav subspace
 tpts = .645e4 + .03e4 + [1:.85e4];%2.09e4;
 
 dx = .25;
@@ -148,9 +148,8 @@ hs{i} = my_subplot(4,4,7,[1.1 1.1]);
 hs{i}.Position(2)=hs{i}.Position(2)+.065;
 hs{i}.Position(1)=hs{i}.Position(1)+.03;
 axis off;
-im=imread('schematicNEW.png');
+im=imread('stimspont_diagram.PNG');
 image(im);
-axis tight;
 axis image
 axis off;
 set(gca,'fontsize',6);
@@ -158,7 +157,7 @@ set(gca,'fontsize',6);
 yh=.02;
 
 dx = .7;
-dy = .65;
+dy = .7;
 
 i=i+1;
 hs{i}=my_subplot(6,4,8,[dx dy]);
@@ -290,30 +289,30 @@ ylabel('behav-only proj2');
 text(1.4,1,'stim 1', 'color',cs(1,:),'HorizontalAlignment','right','fontangle','normal','fontsize',6);
 text(1.4,0.85,'stim 2', 'color',cs(2,:),'HorizontalAlignment','right','fontangle','normal','fontsize',6);
 
+% 
+% i=i+1;
+% hs{i}=my_subplot(6,4,20,[dx dy]);
+% hs{i}.Position(2)=hs{i}.Position(2)+0.02;
+% k=1;
+% normv = squeeze(vsigstimspont(4,[3 2 1 4],:));% ./ sum(vsigstimspont(2,[1 3:4],:),2));
+% randv = mean(squeeze(mean(vsigstimspont(4,5:end,:))));
+% for d = 1:4
+% 	hold all;
+% 	plot([1:size(normv,1)]+.05*randn(1,size(normv,1)), normv(:,d),'o-','color',cm(d,:),'markersize',4);
+% end
+% plot([0 size(normv,1)+1], randv * [1 1],'k--','linewidth',2);
+% text(1.3,.22,'random','HorizontalAlignment','right','fontsize',6)
+% %title({'stim responses','of projections'},'fontweight','normal');
+% set(gca,'xtick',[1:size(normv,1)],'xticklabel',{'stim-only','spont-only','behav-only','stim-behav'});
+% set(gca,'XTickLabelRotation',30);
+% set(gca,'fontsize',6);
+% xlim([.5 size(normv,1)+.5]);
+% ylabel({'signal-to-noise ratio'});
+% axis square;
+
 
 i=i+1;
 hs{i}=my_subplot(6,4,20,[dx dy]);
-hs{i}.Position(2)=hs{i}.Position(2)+0.02;
-k=1;
-normv = squeeze(vsigstimspont(4,[3 2 1 4],:));% ./ sum(vsigstimspont(2,[1 3:4],:),2));
-randv = mean(squeeze(mean(vsigstimspont(4,5:end,:))));
-for d = 1:4
-	hold all;
-	plot([1:size(normv,1)]+.05*randn(1,size(normv,1)), normv(:,d),'o-','color',cm(d,:),'markersize',4);
-end
-plot([0 size(normv,1)+1], randv * [1 1],'k--','linewidth',2);
-text(1.3,.22,'random','HorizontalAlignment','right','fontsize',6)
-%title({'stim responses','of projections'},'fontweight','normal');
-set(gca,'xtick',[1:size(normv,1)],'xticklabel',{'stim-only','spont-only','behav-only','stim-behav'});
-set(gca,'XTickLabelRotation',30);
-set(gca,'fontsize',6);
-xlim([.5 size(normv,1)+.5]);
-ylabel({'signal-to-noise ratio'});
-axis square;
-
-
-i=i+1;
-hs{i}=my_subplot(6,4,23,[dx dy]);
 hs{i}.Position(2)=hs{i}.Position(2)+0.02;
 id = [1];
 normv = squeeze(vsigstimspont(1,[3],:) ./ vsigstimspont(2,[3],:));
@@ -334,7 +333,7 @@ axis square;
 % mult gain and face pred
 i=i+1;
 d=1;
-hs{i}=my_subplot(6,4,24,[.9 .62]);
+hs{i}=my_subplot(6,2,12,[.82 .62]);
 hs{i}.Position(2)=hs{i}.Position(2)-.015;
 hs{i}.Position(1)=hs{i}.Position(1)-.01;
 [ttrain,ttest]=splitInterleaved(length(multgain{d}{3}),30,0.5,1);
@@ -355,12 +354,12 @@ ttest = find(ttest);
 tstim=300:700;
 r = corr(y(ttest),mg(ttest));
 plot(mg(ttest(tstim)),'r','linewidth',1)
-%plot(y(ttest(tstim))*as,'color',.6*[1 1 1],'linewidth',1);
+plot(y(ttest(tstim))*as,'color',.6*[1 1 1],'linewidth',1);
 plot(fg(:,ttest(tstim))'*a,'b','linewidth',0.5)
-text(0,1.3,'gain','color','r','fontangle','normal','fontsize',6);
-text(.25,1.3,sprintf('face prediction of gain\n          r=%1.2f',face_pred_gain_r2(1)),...
+text(0,1.2,'gain','color','r','fontangle','normal','fontsize',6);
+text(.25,1.2,sprintf('face prediction of gain\n          r=%1.2f',face_pred_gain_r2(1)),...
 	'color','b','fontangle','normal','fontsize',6);
-%text(.3,0.1,sprintf('stim-behav shared dim, r=%1.2f',r),'color',.4*[1 1 1],'fontangle','normal','fontsize',6);
+text(.2,0.,sprintf('stim-behav shared dim, r=%1.2f',r),'color',.4*[1 1 1],'fontangle','normal','fontsize',6);
 box off;
 axis tight;
 axis off;
@@ -395,7 +394,7 @@ for j = [1:length(hs)]
         hy0 = 1.0;
     elseif j==5 
         hy0=.85;
-        hp0 = 0.005;
+        hp0 = 0.00;
     elseif j==length(hs)
 		hy0=1.4;
 		hp0=.03;

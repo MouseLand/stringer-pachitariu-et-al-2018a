@@ -35,14 +35,15 @@ clf;
 
 ndat = numel(pc.results.runcorr);
 load('cdat.mat');
-xh = .45;
-yh = .45;
+xh = .5;
+yh = .5;
 yd1=.12;
 yd2 = .07;
 
 i=i+1;
-hs{i}=my_subplot(5,4,1,[xh yh]);
+hs{i}=my_subplot(5,5,1,[xh yh]);
 hs{i}.Position(1) = hs{i}.Position(1)+.02;
+hs{i}.Position(2) = hs{i}.Position(2) + .01;
 axis off;
 hp=hs{i}.Position;
 axes('position',[hp(1)-.08 hp(2)-.03 1.4*hp(3:4)]);
@@ -54,8 +55,9 @@ axis off;
 axis image;
 
 i=i+1;
-hs{i}=my_subplot(5,4,2,[xh yh]);
+hs{i}=my_subplot(5,5,2,[xh yh]);
 hs{i}.Position(1) = hs{i}.Position(1)+.0;
+hs{i}.Position(2) = hs{i}.Position(2) + .01;
 axis off;
 hp=hs{i}.Position;
 axes('position',[hp(1)-.07 hp(2)-.03 1.4*hp(3:4)]);
@@ -67,8 +69,9 @@ axis image;
 
 % ---------- correlation histogram -------------- %
 i = i+1;
-hs{i} = my_subplot(5,4,3,[xh yh]);
-hs{i}.Position(1) = hs{i}.Position(1)+.0;
+hs{i} = my_subplot(5,5,3,[xh yh]);
+hs{i}.Position(1) = hs{i}.Position(1)-.015;
+hs{i}.Position(2) = hs{i}.Position(2) + .01;
 bins = [-.3:.001:.75];
 nb = histcounts(pc.results.cshuff(1:1:end),bins);
 %nb = nb/sum(nb);
@@ -94,8 +97,9 @@ axis square;
 
 % ---------- mean and std of correlations -------------- %
 i = i+1;
-hs{i} = my_subplot(5,4,4,[xh yh]);
-hs{i}.Position(1) = hs{i}.Position(1)+.02;
+hs{i} = my_subplot(5,5,4,[xh yh]);
+hs{i}.Position(1) = hs{i}.Position(1)+.0;
+hs{i}.Position(2) = hs{i}.Position(2) + .01;
 hold all;
 id = [2 1 5 3 4 6:9]; % show gray screen first
 for d = 1:ndat
@@ -129,16 +133,33 @@ behall = behall - min(behall,[],1);
 tstr = {'running','pupil area','whisking','all 3'};
 behall0 = min(5,behall);
 
+i = i+1;
+hs{i} = my_subplot(5,5,5,[xh yh]);
+hs{i}.Position(2) = hs{i}.Position(2) + .01;
+hs{i}.Position(1) = hs{i}.Position(1)+.015;
+%hs{i}.Position(2) = hs{i}.Position(2)+0.05;
+hold all; 
+plot(pcs(:,1),behall(:,1),'.','color',cdat(dex,:),'markersize',4);
+xlabel('magnitude');
+ylabel({'running','speed (a.u.)'});
+axis square;
+axis tight;
+title({'PC 1','r=0.75'},'fontweight','normal','fontsize',6);
+set(gca,'fontsize',6);
+%axis([0 6 0 6]);
+ylim([0 7]);
+
+
 % --------- PC img ------------------ %
 mpcs = min(pcs,[],1);
 %pcs = pcs - mpcs;
-i = 7;
+i = i+2;
 x0 = .26;
 y0 = .76;
 xh0 = .7;
 yh0 = .4;
 hs{i} = my_subplot(5,1,2,[.92 .7]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)-0.1;
+hs{i}.Position(2)=hs{i}.Position(2)-0.09;
 hs{i}.Position(1)=hs{i}.Position(1);
 %hs{i}.Position(1)=hs{i-4}.Position(1);
 pos=hs{i}.Position;
@@ -156,8 +177,8 @@ ht.Rotation = 90;
 axis off;
 axis tight;
 
-tb=.7;
-i=5;
+tb=1;
+i=i-1;
 hs{i}=axes('position',[pos(1) pos(2)+pos(4)+.03 pos(3)*tb .11]);
 hold all;
 cm(1,:) = [.2 .8 .2];
@@ -171,31 +192,18 @@ for j = 1:3
 		%'fontweight','bold');
 end
 plot(pcs(trange(1:length(trange)/3*tb),1),'-.','color',cpc(1,:),'linewidth',0.5);
-text(.4,.86,'PC 1','HorizontalAlignment','right','fontangle','normal','color',cpc(1,:),'fontsize',6)
+text(.4,.95,'PC 1','HorizontalAlignment','right','fontangle','normal','color',cpc(1,:),'fontsize',6)
 text(0,-.05,'10 s','fontangle','normal','fontsize',6);
 plot([0 10/1.2],-1.5*[1 1],'k','LineWidth',2);
 axis tight;
 set(gca,'XColor','w');
 %xlim([-5/3 length(trange)/3]);
 
-i = 6;
-hs{i} = my_subplot(5,4,8,[xh yh]);
-hs{i}.Position(2) = hs{i}.Position(2)+0.05;
-hold all; 
-plot(pcs(:,1),behall(:,1),'.','color',cdat(dex,:),'markersize',4);
-xlabel('magnitude');
-ylabel({'running','speed (a.u.)'});
-axis square;
-axis tight;
-title({'PC 1','r=0.75'},'fontweight','normal','fontsize',6);
-set(gca,'fontsize',6);
-%axis([0 6 0 6]);
-ylim([0 7]);
 
 % ---------- CLUST img ------------- %
-i=8;
+i=i+2;
 hs{i} = my_subplot(5,1,3,[1 0.9]);%axes('position',[x0 y0 xh0 yh0]);
-hs{i}.Position(2)=hs{i}.Position(2)-.04;
+hs{i}.Position(2)=hs{i}.Position(2)-.03;
 hs{i}.Position(1) = hs{i-1}.Position(1);
 hs{i}.Position(4) = hs{i-1}.Position(4);
 hs{i}.Position(3) = hs{i-1}.Position(3);
@@ -215,7 +223,7 @@ axis tight;
 i=i+1;
 hs{i}=my_subplot(5,3,10,[.88 .88]);
 hs{i}.Position(1) = hs{i}.Position(1)-.03;
-hs{i}.Position(2) = hs{i}.Position(2)-.03;
+hs{i}.Position(2) = hs{i}.Position(2)-.02;
 im = imread('cov_fig.png');
 image(im);
 axis off;
@@ -225,7 +233,7 @@ axis image;
 i=i+1;
 hs{i}=my_subplot(5,3,11,[.82 .75]);
 hs{i}.Position(1) = hs{i}.Position(1)-.01;
-hs{i}.Position(2) = hs{i}.Position(2)-.05;
+hs{i}.Position(2) = hs{i}.Position(2)-.04;
 v2 = exampleV2 - mean(exampleV1,2);
 v1 = exampleV1 - mean(exampleV1,2);
 v2 = v2 ./ std(exampleV1(:,:),1,2);
@@ -262,11 +270,11 @@ for n = [1 10 100 1000]
 	t=t+1;
 	if t==1
 		hs{i}=my_subplot(9,5,34+mod(t-1,2)+(t>2)*5,[xh*.9 yh*.9]);
-		hs{i}.Position(2)=hs{i}.Position(2)+.01;
+		hs{i}.Position(2)=hs{i}.Position(2)+.02;
 		hs{i}.Position(1)=hs{i}.Position(1)+.03;
 	else
 		hp=my_subplot(9,5,34+mod(t-1,2)+(t>2)*5,[xh*.9 yh*.9]);
-		hp.Position(2)=hp.Position(2)+.01;
+		hp.Position(2)=hp.Position(2)+.02;
 		hp.Position(1)=hp.Position(1)-.04*mod(t-1,2)+.03;
 	end
 	
@@ -291,7 +299,7 @@ end
 % ----- PEER PRED PC ---------%
 i=i+1;
 hs{i}=my_subplot(5,4,22-5,[xh yh]);
-hs{i}.Position(2)=hs{i}.Position(2)-.04;
+hs{i}.Position(2)=hs{i}.Position(2)-.03;
 hs{i}.Position(1)=hs{i}.Position(1)+.02;
 for d = 1:ndat
     semilogx(cov_neur(:,d)./var_neur(:,d) * 100,'color',cdat(d,:),'linewidth',0.5);
@@ -315,7 +323,7 @@ ylim([0 100]);
 % ----- power-law ---------%
 i=i+1;
 hs{i}=my_subplot(5,4,23-5,[xh yh]);
-hs{i}.Position(2)=hs{i}.Position(2)-.04;
+hs{i}.Position(2)=hs{i}.Position(2)-.03;
 hs{i}.Position(1)=hs{i}.Position(1)+.02;
 for d = 1:ndat
 	loglog(cov_neur(:,d)/sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5)
@@ -338,7 +346,7 @@ grid minor;
 % ----- PEER PRED PC ---------%
 % i=i+1;
 % hs{i}=my_subplot(5,5,23,[xh yh]);
-% hs{i}.Position(2)=hs{i}.Position(2)-.02;
+% hs{i}.Position(2)=hs{i}.Position(2)-.03;
 % hs{i}.Position(1)=hs{i}.Position(1)+.01;
 % for d = 1:ndat
 %     semilogx(cumsum(cov_neur(:,d))./sum(cov_neur(:,d)),'color',cdat(d,:),'linewidth',0.5);
@@ -357,7 +365,7 @@ grid minor;
 % ----- PC By PC VAR EXP ---------%
 i=i+1;
 hs{i}=my_subplot(5,4,24-5,[xh yh]);
-hs{i}.Position(2)=hs{i}.Position(2)-.04;
+hs{i}.Position(2)=hs{i}.Position(2)-.03;
 hs{i}.Position(1)=hs{i}.Position(1)+.02;
 cm(4,:) = [0 0 0];
 idim = [1 1 1 3];
@@ -388,7 +396,7 @@ axis([0 1024 0 100]);
 % ----- PC By PC VAR EXP ---------%
 i=i+1;
 hs{i}=my_subplot(5,4,25-5,[xh yh]);
-hs{i}.Position(2)=hs{i}.Position(2)-.04;
+hs{i}.Position(2)=hs{i}.Position(2)-.03;
 hs{i}.Position(1)=hs{i}.Position(1)+.02;
 cm(4,:) = [0 0 0];
 idim = [1 1 1 3];
@@ -448,13 +456,13 @@ for t = 2:30
 end
 
 % -------------- LETTERS
-hp=.1;
-hy=1.32;
+hp=.08;
+hy=1.27;
 deffont=8;
 for j = [1:length(hs)]
 	hp0=hp; hy0=hy;
-    if j==5
-        hp0 =0.04;
+    if j==6
+        hp0 = 0.04;
         hy0 = 1.15;
 	elseif j==8 || j==7
 		hy0 = 1.02;
@@ -463,13 +471,13 @@ for j = [1:length(hs)]
 		hp0=-.01;
 		hy0=0.95;
 	elseif j==10
-		hp0=0.09;
-		hy0=1.12;
+		hp0=0.07;
+		hy0=1.16;
 	elseif j==11
-		hp0=0.06;
-		hy0=1.8;		
-    elseif j==1 || j==12
-		hy0=hy;
+		hp0=0.05;
+		hy0=1.7;		
+    elseif j>=12
+		hy0=hy*.98;
 		hp0=.1;
 	else
         hp0=hp;

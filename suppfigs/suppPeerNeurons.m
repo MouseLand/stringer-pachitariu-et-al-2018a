@@ -11,7 +11,7 @@ end
 
 %%
 close all;
-default_figure([1 1 8 6.]);
+default_figure([1 1 7.25 6.]);
 
 %%
 
@@ -54,7 +54,7 @@ layeredNet(hp, nls, call, msize,ells);
 text(0,1.16,'peers','HorizontalAlignment','center','fontsize',8);
 text(.5,1.1,'neural PCs','HorizontalAlignment','center','fontsize',8);
 text(1,.95,{'single neuron','activity'},'HorizontalAlignment','center','fontsize',8);
-text(0,1.3,'peer prediction','fontweight','normal','fontangle','normal');
+text(0,1.3,'peer prediction','fontweight','normal','fontangle','italic','fontsize',10);
 % ---------- EPHYS --------%
 i=i+1;
 hs{i} = my_subplot(3,4,2,[xh*1.3 yh*1.3]);
@@ -69,7 +69,7 @@ for j = 1:size(ephys.expv_neurons,1)
 	text(1.05,1-(j-1)*.1,ephys.tgrps{isort(j)},'color',ephys.colors(isort(j),:),'fontangle','normal');
 end
 set(gca,'xtick',2.^[0:3:10]);
-axis([1 512 0 .45]);
+axis([1 512 0 .7]);
 box off;
 ylabel({'variance explained','(test set)'});
 xlabel('# of PCs');
@@ -101,7 +101,7 @@ ylim([0 .3]);
 ylabel({'variance explained'});
 xlabel({'# of PCs'});
 title('peer prediction','fontweight','normal')
-text(-2.2,1.2, {'Single neuron analyses','on two-photon data:'})
+text(-2.2,1.2, {'Single neuron analyses','on two-photon data:'},'fontangle','italic','fontsize',10);
 
 
 i=i+1;

@@ -132,7 +132,7 @@ text(0,0.0,' 30 s','fontsize',6,'fontangle','normal');
 axis tight;
 axis off;
 text(0,1.2,'motion energy PCs','fontsize',6);
-text(1.95,1.2,'neural PCs','fontsize',6);
+text(1.95,1.2,'neural SVCs','fontsize',6);
 text(1.35,1,'rank','fontsize',6);
 h2=my_subplot(4,5,8,[1 .6]);
 h2.Position(1) = h2.Position(1) +.04;
@@ -194,25 +194,25 @@ hs{i} = my_subplot(4,4,8,[xh*1.1 yh*1.1]);
 hs{i}.Position(1) = hs{i}.Position(1) -.06;
 hs{i}.Position(2) = hs{i}.Position(2)+.06;
 hold all;
-shadedErrorBar([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,2),...
-	std((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,1,2)/sqrt(ndat-1),{'color','b','linewidth',1});
-shadedErrorBar([1:1024],mean(cov_neur./var_neur,2),...
-	std(cov_neur./var_neur,1,2)/sqrt(ndat-1),{'color',.8*[1 1 1],'linewidth',1});
-shadedErrorBar([1:1024],mean((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,2),...
-	std((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,1,2)/sqrt(ndat-1),{'color',[0 0.2 0],'linewidth',1});
+shadedErrorBar([1:1024],100*mean((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,2),...
+	std(100*(cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,1,2)/sqrt(ndat-1),{'color','b','linewidth',1});
+shadedErrorBar([1:1024],100*mean(cov_neur./var_neur,2),...
+	std(100*cov_neur./var_neur,1,2)/sqrt(ndat-1),{'color',.8*[1 1 1],'linewidth',1});
+shadedErrorBar([1:1024],100*mean((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,2),...
+	std(100*(cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,1,2)/sqrt(ndat-1),{'color',[0 0.2 0],'linewidth',1});
 %axis([0 .06 0 .06]);
 set(gca,'xtick',10.^[0 1 2])
 text(.55,.9,{'max explainable'},'color',.6*[1 1 1],'fontsize',6)
 text(0.5,0.25,{'run+pupil+whisk'},'fontangle','normal','fontsize',6,'color',[0 .2 0]);
 text(.3,0.6,'face','fontangle','normal','fontsize',6,'color','b');
 text(0.5,-0.25,'SVC dimension','HorizontalAlignment','center');
-ht=text(-.4,0.5,{'variance','explained'},'HorizontalAlignment','center','VerticalAlignment','middle');
+ht=text(-.4,0.5,{'% variance','explained'},'HorizontalAlignment','center','VerticalAlignment','middle');
 set(ht,'rotation',90);
 set(gca,'fontsize',6);
 box off;
 axis square;
 axis tight;
-ylim([0 1]);
+ylim([0 100]);
 xlim([0 128]);
 set(gca,'xscale','log');
 grid on;
@@ -256,7 +256,7 @@ yp = my_conv2(yp, 0.5, 1);
 imagesc(yp,[0 .3])
 colormap(hp,flipud(cgray));
 axis off;
-text(0,1.15,'Neural activity prediction (test set) from faces','fontangle','normal','fontsize',6);
+text(0,1.15,'Neural activity prediction (test set) from face motion','fontangle','normal','fontsize',6);
 ht=text(-.05,0,'1000 neurons','fontsize',6,'fontangle','normal');
 ht.Rotation=90;
 hold all;
@@ -276,21 +276,21 @@ hs{i}.Position(2) = hs{i}.Position(2)+.03;
 expcbeh = cumsum(cov_neur - permute(squeeze(cov_res_beh(:,:,:,9)),[1 3 2]))./cumsum(var_neur);
 expcbeh = squeeze(expcbeh(128,:,:))';
 for j = 1:ndat
-    semilogx(ndims0,expcbeh(:,j),'color',cdat(j,:));
+    semilogx(ndims0,100*expcbeh(:,j),'color',cdat(j,:));
     hold all;
 end
 box off;
 set(gca,'xtick',[1 4 16 64]);
 text(0.5,-0.3,'rank','HorizontalAlignment','center');
-ht=text(-.5,0.5,{'variance','explained'},'HorizontalAlignment','center','VerticalAlignment','middle');
+ht=text(-.5,0.5,{'% variance','explained'},'HorizontalAlignment','center','VerticalAlignment','middle');
 set(ht,'rotation',90);
 axis tight;
-ylim([0 .3]);
+ylim([0 30]);
 xlim([0 128]);
 hold all;
-semilogx(ndims0,mean(expcbeh,2),'b','linewidth',2);
+semilogx(ndims0,mean(expcbeh,2)*100,'b','linewidth',2);
 expcbeh = cumsum(cov_neur - squeeze(cov_res_beh(:,3,:,7)))./cumsum(var_neur);
-semilogx(ndims0,mean(expcbeh(128,:))*ones(length(ndims0),1),'color',[0 .2 0],'linewidth',1);
+semilogx(ndims0,100*mean(expcbeh(128,:))*ones(length(ndims0),1),'color',[0 .2 0],'linewidth',1);
 text(.1,.3,'run+pupil+whisk','fontangle','normal','fontsize',6,'color',[0 .2 0]);
 axis square;
 grid on;
@@ -306,17 +306,18 @@ hs{i}.Position(2) = hs{i-1}.Position(2);
 hs{i}.Position(1) = hs{i}.Position(1) - .0;
 expcbeh = cumsum(cov_neur - squeeze(cov_res_beh(:,6,:,9)))./cumsum(var_neur);
 expccum = cumsum(cov_neur)./cumsum(var_neur);
-ev = [expccum(128,:)' expcbeh(128,:)'];
+ev = 100* [expccum(128,:)' expcbeh(128,:)'];
 hold all;
 for j = 1:size(ev,1)
     plot(ev(j,1), ev(j,2), 'wo',...
-        'markerfacecolor',cdat(j,:),'markersize',5);
+        'markerfacecolor',cdat(j,:),'markersize',4);
 end
-plot([0 30],[0 30],'k','linewidth',1)
+plot([0 80],[0 80],'k','linewidth',1)
 axis square;
 box off;
-ylim([0 .80])
-xlim([0 .8]);
+ylim([0 80])
+xlim([0 80]);
+set(gca,'xtick',[0:20:80],'ytick',[0:20:80]);
 text(0.5,-0.25,'max explainable','HorizontalAlignment','center');
 ht=text(-.4,0.5,{'face'},'HorizontalAlignment','center','VerticalAlignment','middle');
 set(ht,'rotation',90);
@@ -334,13 +335,13 @@ hs{i} = my_subplot(4,5,19,[xh yh]);
 hs{i}.Position(1) = hs{i-2}.Position(1);
 hs{i}.Position(2) = hs{i}.Position(2)+.02;
 hold all;
-plot([0 15],[0 15],'k');
+plot([0 30],[0 30],'k');
 expcbeh3d = cumsum(cov_neur - squeeze(cov_res_beh(:,6,:,10)))./cumsum(var_neur);
 for d = 1:ndat
-    plot(expcbeh(128,d), expcbeh3d(128,d),'wo',...
-        'markerfacecolor',cdat(d,:),'markersize',5);
+    plot(100*expcbeh(128,d), 100*expcbeh3d(128,d),'wo',...
+        'markerfacecolor',cdat(d,:),'markersize',4);
 end
-axis([0 .3 0 .3]);
+axis([0 .3 0 .3]*100);
 text(0.5,-0.25,'face + 3D arousal','HorizontalAlignment','center');
 ht=text(-.4,0.5,{'face'},'HorizontalAlignment','center','VerticalAlignment','middle');
 set(ht,'rotation',90);box off;
@@ -360,15 +361,18 @@ evtlag = cumsum(tlag_cov_neur - tlag_cov_res_beh)./...
 	cumsum(tlag_var_beh);
 hold all;
 for d = 1:ndat
-	plot(tdelay,evtlag(128,:,d),'color',cdat(d,:),'linewidth',0.5)
+	plot(tdelay,100*evtlag(128,:,d),'color',cdat(d,:),'linewidth',0.5)
 end
-plot(tdelay,mean(evtlag(128,:,:),3),'b','linewidth',2);
+plot(tdelay,mean(100*evtlag(128,:,:),3),'b','linewidth',2);
 %axis tight;
 text(0.5,-0.25,'time from behav. (s)','HorizontalAlignment','center');
-ht=text(-.5,0.5,{'variance','explained'},'HorizontalAlignment','center','VerticalAlignment','middle');
+ht=text(-.5,0.5,{'% variance','explained'},'HorizontalAlignment','center','VerticalAlignment','middle');
 set(ht,'rotation',90);
 %title('SVC 1-128','fontweight','normal');
 set(gca,'fontsize',6);
+grid on;
+grid minor;
+grid minor;
 
 
 

@@ -136,7 +136,8 @@ hp=.13;
 hy=1.25;
 deffont=8;
 for j = [1:length(hs)]
-   
+	hp0=hp;
+	hy0=hy;
     hpos = hs{j}.Position;
     axes('position', [hpos(1)-hp0 hpos(2)+hpos(4)*hy0 .01 .01]);
     text(0,0, char(64+j),'fontsize',deffont+2,'fontweight','bold','fontangle','normal');

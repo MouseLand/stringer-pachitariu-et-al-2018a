@@ -190,29 +190,29 @@ ylabel('behav-only proj2');
 text(1.6,1,'11^{\circ} grating', 'color',cs(1,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
 text(1.6,0.85,'55^{\circ} grating', 'color',cs(2,:),'HorizontalAlignment','right','fontangle','normal','fontsize',8);
 
+% 
+% i=i+1;
+% hs{i}=my_subplot(5,2,8,[dx dy]);
+% %hs{i}.Position(2)=hs{i}.Position(2)+0.02;
+% k=1;
+% normv = squeeze(vsigstimspont(4,[3 2 1 4],:));% ./ sum(vsigstimspont(2,[1 3:4],:),2));
+% randv = mean(squeeze(mean(vsigstimspont(4,5:end,:))));
+% for d = 1:4
+% 	hold all;
+% 	plot([1:size(normv,1)]+.05*randn(1,size(normv,1)), normv(:,d),'o-','color',cm(d,:),'markersize',4);
+% end
+% plot([0 size(normv,1)+1], randv * [1 1],'k--','linewidth',2);
+% text(1.3,.22,'random','HorizontalAlignment','right','fontsize',8)
+% %title({'stim responses','of projections'},'fontweight','normal');
+% set(gca,'xtick',[1:size(normv,1)],'xticklabel',{'stim-only','spont-only','behav-only','stim-behav'});
+% set(gca,'XTickLabelRotation',30);
+% xlim([.5 size(normv,1)+.5]);
+% ylabel({'signal-to-noise ratio'});
+% axis square;
+
 
 i=i+1;
 hs{i}=my_subplot(5,2,8,[dx dy]);
-%hs{i}.Position(2)=hs{i}.Position(2)+0.02;
-k=1;
-normv = squeeze(vsigstimspont(4,[3 2 1 4],:));% ./ sum(vsigstimspont(2,[1 3:4],:),2));
-randv = mean(squeeze(mean(vsigstimspont(4,5:end,:))));
-for d = 1:4
-	hold all;
-	plot([1:size(normv,1)]+.05*randn(1,size(normv,1)), normv(:,d),'o-','color',cm(d,:),'markersize',4);
-end
-plot([0 size(normv,1)+1], randv * [1 1],'k--','linewidth',2);
-text(1.3,.22,'random','HorizontalAlignment','right','fontsize',8)
-%title({'stim responses','of projections'},'fontweight','normal');
-set(gca,'xtick',[1:size(normv,1)],'xticklabel',{'stim-only','spont-only','behav-only','stim-behav'});
-set(gca,'XTickLabelRotation',30);
-xlim([.5 size(normv,1)+.5]);
-ylabel({'signal-to-noise ratio'});
-axis square;
-
-
-i=i+1;
-hs{i}=my_subplot(5,2,9,[dx dy]);
 %hs{i}.Position(2)=hs{i}.Position(2)+0.02;
 id = [1];
 normv = squeeze(vsigstimspont(1,[3],:) ./ vsigstimspont(2,[3],:));
@@ -232,7 +232,7 @@ axis square;
 % mult gain and face pred
 i=i+1;
 d=1;
-hs{i}=my_subplot(5,2,10,[.9 .62]);
+hs{i}=my_subplot(5,1,5,[.7 .62]);
 hs{i}.Position(2)=hs{i}.Position(2)-.015;
 hs{i}.Position(1)=hs{i}.Position(1)-.05;
 [ttrain,ttest]=splitInterleaved(length(multgain{d}{3}),30,0.5,1);
@@ -253,12 +253,12 @@ ttest = find(ttest);
 tstim=1:700;
 r = corr(y(ttest),mg(ttest));
 plot(mg(ttest(tstim)),'r','linewidth',1)
-%plot(y(ttest(tstim))*as,'color',.6*[1 1 1],'linewidth',1);
+plot(y(ttest(tstim))*as,'color',.6*[1 1 1],'linewidth',1);
 plot(fg(:,ttest(tstim))'*a,'b','linewidth',0.5)
 text(0,1.2,'gain','color','r','fontangle','normal','fontsize',8);
-text(.25,1.2,sprintf('face prediction of gain\n          r=%1.2f',face_pred_gain_r2(1)),...
+text(.25,1.2,sprintf('face prediction of gain, r=%1.2f',face_pred_gain_r2(1)),...
 	'color','b','fontangle','normal','fontsize',8);
-%text(.3,0.1,sprintf('stim-behav shared dim, r=%1.2f',r),'color',.4*[1 1 1],'fontangle','normal','fontsize',8);
+text(.3,0.,sprintf('stim-behav shared dim, r=%1.2f',r),'color',.4*[1 1 1],'fontangle','normal','fontsize',8);
 box off;
 axis tight;
 axis off;
