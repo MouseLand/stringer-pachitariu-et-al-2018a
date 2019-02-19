@@ -11,15 +11,24 @@ It relies on data deposited on figshare at:
 Carsen Stringer, Marius Pachitariu, Charu Bai Reddy, Matteo Carandini, Kenneth D. Harris
 **Recordings of ten thousand neurons in visual cortex during spontaneous behaviors.** ([link](https://figshare.com/articles/Recordings_of_ten_thousand_neurons_in_visual_cortex_during_spontaneous_behaviors/6163622))
 
-Here's the data [description](dataSharing.pdf).
+and
 
-The datasets to produce figures 1-4,6 are available. Shortly we will add new datasets for figure 5. 
+Nicholas Steinmetz, Marius Pachitariu, Carsen Stringer, Matteo Carandini, Kenneth D. Harris
+**Eight probe neuropixels recordings during spontaneous behaviors.** [link]
 
-The script 'mainFigs.m' calls all figure-producing scripts. Set useGPU=0 if you do not have a GPU.
+Here's the two-photon data [description](dataSharing.pdf).
+
+The datasets to produce figures 1-4 are available.
+
+The script 'processData.m' processes all the data. Set useGPU=0 if you do not have a GPU.
+
+The script 'mainFigs.m' calls all figure-producing scripts. 
 
 While this is useful for reproducing the paper, it does not easily allow building on the main analysis we do, or running these analyses on different data. Therefore, we will add separate scripts to run analyses one at at time, with the data clearly loaded at the top of the script, so you can swap yours in. 
 
-### How to load the data into python ###
+One such function that is easy to use is 'SVCA.m' which computes the cross-validated reliable variance of latent dimensions in the population activity.
+
+### How to load the 2P data into python ###
 ```
 import scipy.io as sio
 import numpy as np
