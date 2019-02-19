@@ -4,7 +4,7 @@ This code produces the figures from Stringer, Pachitariu et al, 2018a:
 
 Carsen Stringer, Marius Pachitariu, Nicholas Steinmetz, Charu Bai Reddy, Matteo Carandini, Kenneth D. Harris
 **Spontaneous behaviors drive multidimensional, brain-wide population activity**
-https://www.biorxiv.org/content/early/2018/04/22/306019
+https://www.biorxiv.org/content/10.1101/306019v2
 
 It relies on data deposited on figshare at:
 
