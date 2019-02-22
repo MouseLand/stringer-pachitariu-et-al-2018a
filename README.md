@@ -1,4 +1,6 @@
 # stringer-pachitariu-et-al-2018a
+[![DOI](https://zenodo.org/badge/130262484.svg)](https://zenodo.org/badge/latestdoi/130262484)
+
 
 This code produces the figures from Stringer, Pachitariu et al, 2018a:
 
@@ -16,7 +18,7 @@ and
 Nicholas Steinmetz, Marius Pachitariu, Carsen Stringer, Matteo Carandini, Kenneth D. Harris
 **Eight probe neuropixels recordings during spontaneous behaviors.** [link]
 
-Here's the two-photon data [description](dataSharing.pdf).
+Here's the two-photon data [description](dataSharing.pdf). Please cite the paper and the figshare if you use the data.
 
 The script 'processData.m' processes all the data. Set useGPU=0 if you do not have a GPU. The script 'mainFigs.m' calls all figure-producing scripts. 
 
