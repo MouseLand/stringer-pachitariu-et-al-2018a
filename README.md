@@ -16,7 +16,7 @@ Carsen Stringer, Marius Pachitariu, Charu Bai Reddy, Matteo Carandini, Kenneth D
 and
 
 Nicholas Steinmetz, Marius Pachitariu, Carsen Stringer, Matteo Carandini, Kenneth D. Harris
-**Eight probe neuropixels recordings during spontaneous behaviors.** [link]
+**Eight probe neuropixels recordings during spontaneous behaviors.** ([link](https://figshare.com/articles/Eight-probe_Neuropixels_recordings_during_spontaneous_behaviors/7739750))
 
 Here's the two-photon data [description](dataSharing.pdf). Please cite the paper and the figshare if you use the data.
 
@@ -49,24 +49,37 @@ mt[‘stat’][0]     # first cell’s stats
 mt[‘stat’][0][‘npix’]       # one example field, tells you how pixels make up the cell
 ```
 
-<!---
+### How to load the ephys data into python ###
+```
+from scipy import io
 
-Sorting by the top principal component.
+probeLoc = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeLocations.mat')
 
-### Analysis two ###
+mouse_names = ['Krebs','Waksman','Robbins']
+imouse = 0
 
-Reduced-rank regression from a set of behavioral variables to a set of neural activities.
+spks = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/spks/spks%s_Feb18.mat'%mouse_names[imouse], squeeze_me=True)
+faces = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/faces/%s_face_proc.mat'%mouse_names[imouse], squeeze_me=True)
 
-### Analysis three ###
+# probe k
+k = 0
+# spike times (in seconds)
+st = spks['spks'][k][0]
+# clusters
+clu = spks['spks'][k][1]
+# cluster heights (in microns)
+# (see siteCoords to convert to site location)
+Wh = spks['spks'][k][2]
 
-Low-dimensional nonlinear embedding into a 1D manifold. 
+# processed faces
+motSVD = faces['motionSVD']
+video_timestamps = faces['times']
 
-### Analysis four ###
+# where is the probe in the brain (in microns)
+ccfCoords = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['ccfCoords']
+# name of area in Allen ontology by site on electrode
+ccfNames = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['ccfOntology']
+# coordinates of each site on the electrode
+siteCoords = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['siteCoords']
 
-Predicting a single neuron from its simultaneously-recorded peer using reduced-rank regression. 
-
-### Analysis five ###
-
-Comparison of population activity from two task conditions, for example spontaneous activity and stimulus presentation. 
- 
---->
+```
