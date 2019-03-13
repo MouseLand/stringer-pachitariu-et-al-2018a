@@ -56,6 +56,9 @@ from scipy import io
 probeLoc = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeLocations.mat')
 
 mouse_names = ['Krebs','Waksman','Robbins']
+# start of spontaneous activity in each mouse (in seconds)
+tstart = [3811 3633 3323];
+
 imouse = 0
 
 spks = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/spks/spks%s_Feb18.mat'%mouse_names[imouse], squeeze_me=True)
