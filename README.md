@@ -96,7 +96,4 @@ ccfCoords = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['ccfCoords']
 ccfNames = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['ccfOntology']
 # coordinates of each site on the electrode
 siteCoords = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['siteCoords']
-
-
-
 ```
