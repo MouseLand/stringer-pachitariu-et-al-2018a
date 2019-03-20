@@ -54,7 +54,7 @@ mt[‘stat’][0][‘npix’]       # one example field, tells you how pixels ma
 from scipy import io
 
 probeLoc = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeLocations.mat')
-probeBorders = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeBorders.mat')
+probeBorders = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeBorders.mat', squeeze_me=True)
 
 mouse_names = ['Krebs','Waksman','Robbins']
 # start of spontaneous activity in each mouse (in seconds)
