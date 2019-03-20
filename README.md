@@ -54,6 +54,7 @@ mt[‘stat’][0][‘npix’]       # one example field, tells you how pixels ma
 from scipy import io
 
 probeLoc = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeLocations.mat')
+probeBorders = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeBorders.mat')
 
 mouse_names = ['Krebs','Waksman','Robbins']
 # start of spontaneous activity in each mouse (in seconds)
@@ -78,11 +79,24 @@ Wh = spks['spks'][k][2]
 motSVD = faces['motionSVD']
 video_timestamps = faces['times']
 
+# where is the probe in the brain (consolidated labels)
+# borders are in microns
+# use Wh to determine which clusters are in which brain region
+borders = probeBorders['probeBorders'][imouse]['borders'][k]
+for j in range(len(borders)):
+   b = borders[j]
+   print('upper border %d, lower border %d, area %s'%(b[0],b[1],b[2]))
+   wneurons = np.logical_and(Wh>=b[1], Wh<b[0])
+   nn = wneurons.sum()
+   print('%d neurons in %s'%(nn,b[-1]))
+   
 # where is the probe in the brain (in microns)
 ccfCoords = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['ccfCoords']
 # name of area in Allen ontology by site on electrode
 ccfNames = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['ccfOntology']
 # coordinates of each site on the electrode
 siteCoords = probeLoc['probeLocations'][0][imouse]['probe'][k][0]['siteCoords']
+
+
 
 ```
