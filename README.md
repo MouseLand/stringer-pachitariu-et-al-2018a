@@ -27,7 +27,7 @@ While this is useful for reproducing the paper, it does not easily allow buildin
 One such function that is easy to use is 'SVCA.m' which computes the cross-validated reliable variance of latent dimensions in the population activity.
 
 ### How to load the 2P data into python ###
-```
+```python
 import scipy.io as sio
 import numpy as np
 mt = sio.loadmat('spont_M150824_MP019_2016-04-05.mat')
@@ -50,7 +50,7 @@ mt[‘stat’][0][‘npix’]       # one example field, tells you how pixels ma
 ```
 
 ### How to load the ephys data into python ###
-```
+```python
 from scipy import io
 
 probeLoc = io.loadmat('/home/carsen/dm11/data/Spikes/eightprobes/probeLocations.mat')
