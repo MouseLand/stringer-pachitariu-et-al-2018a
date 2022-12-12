@@ -21,11 +21,11 @@ for imouse = [1:3]
     
     
     % load files
-    beh = load(fullfile(ephysroot, sprintf('%s_face_proc.mat',mouse_name)));
+    beh = load(fullfile(ephysroot, "faces", sprintf('%s_face_proc.mat',mouse_name)));
 	motSVD = beh.motionSVD;
 	tVid = beh.times; % times of movie frames in spike reference frame
 	
-    load(fullfile(ephysroot, sprintf('spks%s_Feb18.mat',mouse_name)));
+    load(fullfile(ephysroot, "spks", sprintf('spks%s_Feb18.mat',mouse_name)));
     
     %% extract spikes
     stall = zeros(5e3,5500,'uint8');

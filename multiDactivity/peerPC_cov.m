@@ -72,6 +72,10 @@ for d = [1:length(dall.db)]
 	semilogx(sneur./varneur)
 	
 	[u2,~,~] = svdecon(Ff(ntrain,itrain));
+	
+	s1 = u' * Ff(ntrain,itest);  
+        s2 = v' * Ff(ntest,itest); 
+	
 	cpc = corr(gather_try(s1(1,:)'), gather_try(Ff(ntrain,itest)' * u2(:,1)));
 	disp(cpc);
 	corrPC1(d) = cpc;
