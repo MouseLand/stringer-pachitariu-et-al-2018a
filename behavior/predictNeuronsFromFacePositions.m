@@ -55,6 +55,8 @@ for d = [1:length(dall.db)]
     x    = reshape(x, [], np);
     x    = x';
     
+    ndims0 = [1 2 3 4 8 16 32 64 128];
+	
     ndims1 = ndims0(ndims0<=size(x,1) & ndims0<=size(v,1));
         
     %% low rank regression
