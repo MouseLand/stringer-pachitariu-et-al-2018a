@@ -59,7 +59,7 @@ for d = [1:length(dall.db)]
     %Ff = randn(size(Ff));
     Lblock = 60;
     fractrain = 0.5;
-    [itrain, itest] = splitInterleaved(NT, Lblock, fractrain, 1);
+    [itrain, itest] = splitInterleaved(NT, Lbleock, fractrain, 1);
     tic;
     if useGPU
         Ff = gpuArray(single(Ff));

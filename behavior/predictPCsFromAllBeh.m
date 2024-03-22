@@ -15,6 +15,35 @@ for d = [1:length(dall.db)]
     %%
     dat = load(fullfile(dataroot,sprintf('spont_%s_%s.mat',dall.db(d).mouse_name,dall.db(d).date)));
     
+    % Check if d+1 exists
+    if d+1 <= length(dall.db)
+        % If d+1 exists, load data for d+1
+        dat_2 = load(fullfile(dataroot, sprintf('spont_%s_%s.mat', dall.db(d+1).mouse_name, dall.db(d+1).date)));
+    else
+        % If d+1 does not exist, consider loading data for d-1 if d is not the first index
+        if d > 1
+            dat_2 = load(fullfile(dataroot, sprintf('spont_%s_%s.mat', dall.db(d-1).mouse_name, dall.db(d-1).date)));
+        end
+    end
+    
+    % Determine the minimum number of columns for Fsp
+    minColsFsp = min(size(dat.Fsp, 2), size(dat_2.Fsp, 2));
+
+    % Adjust the Fsp fields in both structures
+    dat.Fsp = dat.Fsp(:, 1:minColsFsp);
+    dat_2.Fsp = dat_2.Fsp(:, 1:minColsFsp);
+
+    % Since med and stat have the same row dimension as Fsp, adjust their rows to match
+    % (Assuming med does not need column adjustment as it is ?x3, and stat is likely a 1D array)
+    dat.beh.runSpeed = dat.beh.runSpeed(1:minColsFsp)
+    dat_2.beh.runSpeed = dat_2.beh.runSpeed(1:minColsFsp)
+    dat_2.beh.pupil.area =dat_2.beh.pupil.area(1:minColsFsp)
+    dat.beh.pupil.area =dat.beh.pupil.area(1:minColsFsp)
+    dat_2.beh.whisker.motionSVD = dat_2.beh.whisker.motionSVD(1:minColsFsp,:)
+    dat.beh.whisker.motionSVD = dat.beh.whisker.motionSVD(1:minColsFsp,:)
+    dat_2.beh.face.motionSVD = dat_2.beh.face.motionSVD(1:minColsFsp,:)
+    dat.beh.face.motionSVD = dat.beh.face.motionSVD(1:minColsFsp,:)
+    
     if isfield(dat.stat,'redcell')
         Ff = dat.Fsp(~logical([dat.stat(:).redcell]), :);
         med    = dat.med(~logical([dat.stat(:).redcell]),:);
@@ -75,37 +104,37 @@ for d = [1:length(dall.db)]
     %% loop over behavioral predictors
     
     for btype = [1:10]
-        wmot = dat.beh.whisker.motionSVD(:,1);
-        wmot = wmot * sign(mean(mean(dat.beh.whisker.motionMask(:,:,1))));
+        wmot = dat_2.beh.whisker.motionSVD(:,1);
+        wmot = wmot * sign(mean(mean(dat_2.beh.whisker.motionMask(:,:,1))));
         switch btype
             %wmot = wmot * sign
             case 1
-                x = zscore([dat.beh.runSpeed(:)],1,1);
+                x = zscore([dat_2.beh.runSpeed(:)],1,1);
             case 2
-                x = zscore([dat.beh.pupil.area(:)],1,1);
+                x = zscore([dat_2.beh.pupil.area(:)],1,1);
             case 3
-                x = zscore([dat.beh.whisker.motionSVD(:,1)],1,1);
+                x = zscore([dat_2.beh.whisker.motionSVD(:,1)],1,1);
             case 4
-                x = zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:)],1,1);
+                x = zscore([dat_2.beh.runSpeed(:) dat_2.beh.pupil.area(:)],1,1);
             case 5
-                x = zscore([dat.beh.runSpeed(:) wmot],1,1);
+                x = zscore([dat_2.beh.runSpeed(:) wmot],1,1);
             case 6
-                x = zscore([dat.beh.pupil.area(:) wmot],1,1);
+                x = zscore([dat_2.beh.pupil.area(:) wmot],1,1);
             case 7
-                x = zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:) wmot],1,1);
+                x = zscore([dat_2.beh.runSpeed(:) dat_2.beh.pupil.area(:) wmot],1,1);
             case 8
-                x = zscore(dat.beh.face.motionSVD(:,1),1,1);
+                x = zscore(dat_2.beh.face.motionSVD(:,1),1,1);
             case 9
-                x = dat.beh.face.motionSVD;
+                x = dat_2.beh.face.motionSVD;
                 x = x - mean(x,1);
                 x = x / std(x(:,1));
             case 10
-                x = dat.beh.face.motionSVD;
+                x = dat_2.beh.face.motionSVD;
                 x = x - mean(x,1);
                 x = x / std(x(:,1));
-                x = [x zscore([dat.beh.runSpeed(:) dat.beh.pupil.area(:) wmot],1,1)];
+                x = [x zscore([dat_2.beh.runSpeed(:) dat_2.beh.pupil.area(:) wmot],1,1)];
         end
-      
+        
         x    = x * 10;
         x    = x(1:end-(tdelay),:); % apply time delay
         x    = bin2d(x, tbin, 1);

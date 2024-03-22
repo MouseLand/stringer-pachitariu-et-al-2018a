@@ -1,7 +1,7 @@
 % where data is stored (that you download from figshare)
 dataroot = '/media/carsen/DATA2/grive/10krecordings/spont_paper/';        
 % where processed data and results are saved
-matroot  = '/media/carsen/DATA2/grive/10krecordings/spontResults/';
+matroot  = '/alzheimer/Roberto/Data_papers/spontResults/';
 
 
 %% this will produce the figures
