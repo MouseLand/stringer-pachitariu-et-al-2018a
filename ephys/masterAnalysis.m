@@ -1,4 +1,4 @@
-% runs all the analyses for the EPHYS recordings!
+1% runs all the analyses for the EPHYS recordings!
 function masterAnalysis(matroot)
 
 mstr = {'Krebs','Waksman','Robbins'};

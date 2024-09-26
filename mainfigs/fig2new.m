@@ -195,11 +195,11 @@ hs{i}.Position(1) = hs{i}.Position(1) -.06;
 hs{i}.Position(2) = hs{i}.Position(2)+.06;
 hold all;
 shadedErrorBar([1:1024],100*mean((cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,2),...
-	std(100*(cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,1,2)/sqrt(ndat-1),{'color','b','linewidth',1});
+	std(100*(cov_neur-squeeze(cov_res_beh(:,6,:,9)))./var_neur,1,2)/sqrt(ndat-1),'lineProps',{'color','b','linewidth',1});
 shadedErrorBar([1:1024],100*mean(cov_neur./var_neur,2),...
-	std(100*cov_neur./var_neur,1,2)/sqrt(ndat-1),{'color',.8*[1 1 1],'linewidth',1});
+	std(100*cov_neur./var_neur,1,2)/sqrt(ndat-1),'lineProps',{'color',.8*[1 1 1],'linewidth',1});
 shadedErrorBar([1:1024],100*mean((cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,2),...
-	std(100*(cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,1,2)/sqrt(ndat-1),{'color',[0 0.2 0],'linewidth',1});
+	std(100*(cov_neur-squeeze(cov_res_beh(:,3,:,7)))./var_neur,1,2)/sqrt(ndat-1),'lineProps',{'color',[0 0.2 0],'linewidth',1});
 %axis([0 .06 0 .06]);
 set(gca,'xtick',10.^[0 1 2])
 text(.55,.9,{'max explainable'},'color',.6*[1 1 1],'fontsize',6)

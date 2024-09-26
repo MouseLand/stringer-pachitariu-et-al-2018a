@@ -2,13 +2,13 @@ clear all
 
 % you should change this to your local data paths
 % where you downloaded the 2P data
-dataroot = '/media/carsen/DATA2/grive/10krecordings/spontData';
+dataroot = '/alzheimer/Roberto/Data_papers/6163622/';
 
 % where ephys data is
 ephysroot = '/home/carsen/dm11/data/Spikes/eightprobes/';
 
 % give a local folder for saving intermediate data (around 4-5GB)
-matroot = '/media/carsen/DATA2/grive/10krecordings/spontResults';
+matroot = '/alzheimer/Roberto/Data_papers/spontResults/';
 
 mkdir(matroot)
 
@@ -16,7 +16,7 @@ mkdir(matroot)
 useGPU = 1;
 
 % should be in github folder
-addpath(genpath('.'));
+%addpath(genpath('.'));
 
 % also download rastermap
 % https://github.com/MouseLand/rastermap/
